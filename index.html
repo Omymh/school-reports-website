@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>نموذج تقرير حصص الانتظار – نسخة ويب</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <meta name="color-scheme" content="light dark" />
+    <style>
+      @media print { .print\:hidden { display: none !important; } }
+      table { border-collapse: separate; border-spacing: 0; }
+      thead th { position: sticky; top: 0; z-index: 1; }
+    </style>
+  </head>
+  <body class="bg-neutral-50 text-neutral-900">
+    <div id="root"></div>
+    <script type="text/babel">
+      const SCHOOL_NAME = "الابتدائية الخامسة والتسعون (طفولة مبكرة)";
+      const DAYS = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
+      const Th = ({ children, className = "" }) => (<th className={`text-right px-3 py-2 text-xs font-semibold border-b ${className}`}>{children}</th>);
+      const Td = ({ children, className = "" }) => (<td className={`px-2 py-2 align-top ${className}`}>{children}</td>);
+      const InlineInput = ({ value, onChange }) => (<input value={value} onChange={(e)=>onChange(e.target.value)} className="border-b border-neutral-300 focus:border-neutral-600 outline-none px-1 py-0.5 rounded-sm" />);
+      const Select = ({ value, onChange, options }) => (<select value={value} onChange={(e)=>onChange(e.target.value)} className="w-full border rounded-lg px-2 py-1">{options.map((op,i)=>(<option key={i} value={op}>{op}</option>))}</select>);
+      const Check = ({ label, checked, onChange }) => (<label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={checked} onChange={(e)=>onChange(e.target.checked)} /><span>{label}</span></label>);
+      function emptyRow() { return { day: "", date: "", grade: "", period: "", absentTeacher: "", executed: "", witness: "", domain: { basics: false, values: false, future: false } }; }
+      function newWeekTemplate() { return { id: `week-${Date.now()}`, title: "تقرير تنفيذ حصص الانتظار – الأسبوع", coordinator: "", principal: "", teacherName: "", rows: Array.from({ length: 5 }, (_, i) => ({ ...emptyRow(), day: DAYS[i] })) }; }
+      function ReportApp() {
+        const [weeks, setWeeks] = React.useState(() => {
+          const saved = localStorage.getItem("report-weeks-v3");
+          if (saved) { try { return JSON.parse(saved); } catch { return [newWeekTemplate()]; } }
+          return [newWeekTemplate()];
+        });
+        const printableDate = React.useMemo(() => new Date().toLocaleDateString("ar-SA"), []);
+        const printAreaRef = React.useRef(null);
+        React.useEffect(() => { localStorage.setItem("report-weeks-v3", JSON.stringify(weeks)); }, [weeks]);
+        const addWeek = () => setWeeks((w) => [...w, newWeekTemplate()]);
+        const removeWeek = (id) => setWeeks((w) => w.filter((wk) => wk.id !== id));
+        const addRow = (weekId) => setWeeks((w) => w.map((wk) => wk.id === weekId ? { ...wk, rows: [...wk.rows, emptyRow()] } : wk));
+        const removeRow = (weekId, idx) => setWeeks((w) => w.map((wk) => wk.id === weekId ? { ...wk, rows: wk.rows.filter((_, i) => i !== idx) } : wk));
+        const setWeekField = (weekId, field, value) => setWeeks((w) => w.map((wk) => (wk.id === weekId ? { ...wk, [field]: value } : wk)));
+        const setCell = (weekId, idx, path, value) => {
+          setWeeks((w) => w.map((wk) => {
+            if (wk.id !== weekId) return wk;
+            const rows = [...wk.rows];
+            const row = { ...rows[idx] };
+            if (path.startsWith("domain.")) { const key = path.split(".")[1]; row.domain = { ...row.domain, [key]: value }; }
+            else { row[path] = value; }
+            rows[idx] = row;
+            return { ...wk, rows };
+          }));
+        };
+        const exportPDF = async () => {
+          const area = printAreaRef.current; if (!area) return;
+          const canvas = await window.html2canvas(area, { scale: 2, useCORS: true, scrollY: -window.scrollY });
+          const { jsPDF } = window.jspdf;
+          const imgData = canvas.toDataURL("image/jpeg", 0.95);
+          const pdf = new jsPDF("p", "mm", "a4");
+          const pageWidth = 210, pageHeight = 297;
+          const imgWidth = pageWidth, imgHeight = (canvas.height * imgWidth) / canvas.width;
+          let heightLeft = imgHeight, position = 0;
+          pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+          heightLeft -= pageHeight;
+          while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+            heightLeft -= pageHeight;
+          }
+          pdf.save("تقرير-حصص-الانتظار.pdf");
+        };
+        return (
+          <div dir="rtl" className="min-h-screen bg-neutral-50 text-neutral-900 p-4 md:p-8">
+            <div className="max-w-6xl mx-auto mb-4 print:hidden flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">نموذج تقرير حصص الانتظار</h1>
+                <span className="text-sm text-neutral-500">(مطابق للنموذج الورقي وبمظهر مرتب)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={exportPDF} className="px-3 py-2 rounded-xl shadow text-sm font-semibold bg-neutral-900 text-white hover:bg-neutral-800">تصدير PDF</button>
+                <button onClick={addWeek} className="px-3 py-2 rounded-xl shadow text-sm font-semibold bg-white hover:bg-neutral-100 border">إضافة أسبوع</button>
+              </div>
+            </div>
+            <div ref={printAreaRef} className="max-w-6xl mx-auto space-y-6">
+              <header className="bg-white rounded-2xl border shadow-sm p-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                  <div className="col-span-2">
+                    <div className="text-xs text-neutral-500">اسم المدرسة</div>
+                    <div className="text-lg font-bold">{SCHOOL_NAME}</div>
+                  </div>
+                  <div className="text-end">
+                    <div className="text-xs text-neutral-500">تاريخ الطباعة</div>
+                    <div className="text-sm font-semibold">{printableDate}</div>
+                  </div>
+                </div>
+              </header>
+              {weeks.map((wk) => (
+                <section key={wk.id} className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between p-4 border-b">
+                    <input value={wk.title} onChange={(e)=>setWeekField(wk.id, "title", e.target.value)} className="text-lg md:text-xl font-bold w-full bg-transparent outline-none" />
+                    <div className="flex items-center gap-2 print:hidden">
+                      <button onClick={() => addRow(wk.id)} className="px-3 py-2 rounded-xl text-xs font-semibold bg-neutral-800 text-white hover:bg-neutral-700">+ صف</button>
+                      <button onClick={() => addWeek()} className="px-3 py-2 rounded-xl text-xs font-semibold bg-neutral-200 hover:bg-neutral-300">+ أسبوع</button>
+                      {weeks.length > 1 && <button onClick={() => removeWeek(wk.id)} className="px-3 py-2 rounded-xl text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100">حذف الأسبوع</button>}
+                    </div>
+                  </div>
+                  <div className="p-4 border-b">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-start gap-3 text-sm">
+                      <div className="flex items-center gap-2"><span className="text-neutral-700">المنسقة:</span><InlineInput value={wk.coordinator} onChange={(v)=>setWeekField(wk.id, "coordinator", v)} /></div>
+                      <div className="flex items-center gap-2"><span className="text-neutral-700">مديرة المدرسة:</span><InlineInput value={wk.principal} onChange={(v)=>setWeekField(wk.id, "principal", v)} /></div>
+                      <div className="flex items-center gap-2"><span className="text-neutral-700">المعلمة:</span><InlineInput value={wk.teacherName} onChange={(v)=>setWeekField(wk.id, "teacherName", v)} /></div>
+                    </div>
+                  </div>
+                  <div className="overflow-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-neutral-100 text-neutral-700">
+                        <tr>
+                          <Th>#</Th>
+                          <Th>اليوم</Th>
+                          <Th>التاريخ</Th>
+                          <Th>الصف</Th>
+                          <Th>الحصة</Th>
+                          <Th>المعلمة الغائبة</Th>
+                          <Th className="min-w-[220px]">ما تم تنفيذه</Th>
+                          <Th className="min-w-[180px]">الشاهد</Th>
+                          <Th><div className="leading-tight"><div className="font-semibold">المجال</div><div className="text-[11px] text-neutral-500">اختر واحدًا أو أكثر</div></div></Th>
+                          <Th className="print:hidden">إجراءات</Th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {wk.rows.map((r, idx) => (
+                          <tr key={idx} className={idx % 2 ? "bg-neutral-50 border-b" : "border-b"}>
+                            <Td className="text-neutral-500">{idx + 1}</Td>
+                            <Td><Select value={r.day} onChange={(v)=>setCell(wk.id, idx, "day", v)} options={["", ...DAYS]} /></Td>
+                            <Td><input type="date" value={r.date} onChange={(e)=>setCell(wk.id, idx, "date", e.target.value)} className="w-full border rounded-lg px-2 py-1" /></Td>
+                            <Td><input value={r.grade} onChange={(e)=>setCell(wk.id, idx, "grade", e.target.value)} placeholder="مثال: 1/أ" className="w-full border rounded-lg px-2 py-1" /></Td>
+                            <Td><input value={r.period} onChange={(e)=>setCell(wk.id, idx, "period", e.target.value)} placeholder="مثال: الرابعة" className="w-full border rounded-lg px-2 py-1" /></Td>
+                            <Td><input value={r.absentTeacher} onChange={(e)=>setCell(wk.id, idx, "absentTeacher", e.target.value)} placeholder="اسم المعلمة" className="w-full border rounded-lg px-2 py-1" /></Td>
+                            <Td><textarea value={r.executed} onChange={(e)=>setCell(wk.id, idx, "executed", e.target.value)} placeholder="وصف مختصر لما تم تنفيذه" className="w-full border rounded-lg px-2 py-1 min-h-[44px]"></textarea></Td>
+                            <Td><textarea value={r.witness} onChange={(e)=>setCell(wk.id, idx, "witness", e.target.value)} placeholder="الشاهد/الدليل" className="w-full border rounded-lg px-2 py-1 min-h-[44px]"></textarea></Td>
+                            <Td className="print:hidden"><button onClick={() => removeRow(wk.id, idx)} className="px-2 py-1 rounded-lg text-xs bg-red-50 text-red-600 border hover:bg-red-100">حذف</button></Td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<ReportApp />);
+    </script>
+  </body>
+</html>
