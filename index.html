@@ -2,10 +2,7 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>تقرير حصص الانتظار – الثانوية السادسة والعشرون (تبوك)</title>
 
     <!-- Tailwind عبر CDN -->
@@ -38,25 +35,19 @@
       table{border-collapse:collapse;width:100%;}
       thead th{position:sticky;top:0;z-index:1;background:var(--paper);}
       th,td{border:1px solid var(--border);}
-
-      /* طباعة: نُظهر فقط الديباجة + الجداول (نخفي كل شيء بعلامة print-hide) */
-      @media print{
-        .print-hide{display:none!important;}
-        body{background:#fff!important;}
-      }
+      /* طباعة: نُظهر فقط الديباجة + الجداول (نخفي أي عنصر بعلامة print-hide) */
+      @media print{ .print-hide{display:none!important;} body{background:#fff!important;} }
     </style>
   </head>
   <body>
-    <!-- ديباجة علوية وهوية خضراء (تظهر في العرض فقط، ونطبع الديباجة داخل منطقة التصدير) -->
-    <div
-      class="rounded-none md:rounded-2xl mx-auto my-3 md:my-6 max-w-6xl border print-hide"
-      style="background:var(--banner-bg);color:var(--banner-ink);border-color:var(--border);"
-    >
+    <!-- ديباجة علوية (زر التصدير لن يُطبع) -->
+    <div class="rounded-none md:rounded-2xl mx-auto my-3 md:my-6 max-w-6xl border print-hide"
+         style="background:var(--banner-bg);color:var(--banner-ink);border-color:var(--border);">
       <div class="px-4 py-4 md:px-6 md:py-5 flex items-center justify-between">
         <div class="text-base md:text-lg font-bold">الثانوية السادسة والعشرون - تبوك</div>
-        <button id="exportBtn" class="px-3 py-2 rounded-xl text-sm font-semibold" style="background:var(--accent);color:#fff;">
-          تصدير PDF
-        </button>
+        <button id="exportBtn" onclick="window.__exportPDF && window.__exportPDF()"
+                class="px-3 py-2 rounded-xl text-sm font-semibold"
+                style="background:var(--accent);color:#fff;">تصدير PDF</button>
       </div>
     </div>
 
@@ -71,8 +62,9 @@
       </div>
     </footer>
 
-    <script type="text/babel">
-      // ===== مكونات صغيرة =====
+    <!-- ملاحظة مهمة: نحدد الـpresets للـBabel عشان JSX يشتغل على Pages -->
+    <script type="text/babel" data-presets="env,react">
+      /* ===== مكونات صغيرة ===== */
       const Th = ({ children, className = "" }) => (
         <th className={`text-right px-3 py-2 text-xs font-semibold ${className}`}>{children}</th>
       );
@@ -80,66 +72,48 @@
         <td className={`px-2 py-2 align-top ${className}`}>{children}</td>
       );
       const InlineInput = ({ value, onChange, aria }) => (
-        <input
-          aria-label={aria}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="border-b outline-none px-1 py-0.5 rounded-sm"
-          style={{ borderColor: "var(--border)" }}
-        />
+        <input aria-label={aria} value={value} onChange={(e)=>onChange(e.target.value)}
+               className="border-b outline-none px-1 py-0.5 rounded-sm"
+               style={{ borderColor: "var(--border)" }} />
       );
       const Select = ({ value, onChange, options, aria }) => (
-        <select
-          aria-label={aria}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full border rounded-lg px-2 py-1"
-          style={{ borderColor: "var(--border)" }}
-        >
-          {options.map((op, i) => (
-            <option key={i} value={op}>{op}</option>
-          ))}
+        <select aria-label={aria} value={value} onChange={(e)=>onChange(e.target.value)}
+                className="w-full border rounded-lg px-2 py-1"
+                style={{ borderColor: "var(--border)" }}>
+          {options.map((op,i)=>(<option key={i} value={op}>{op}</option>))}
         </select>
       );
       const Check = ({ label, checked, onChange }) => (
         <label className="flex items-center gap-2 text-xs">
-          <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+          <input type="checkbox" checked={checked} onChange={(e)=>onChange(e.target.checked)} />
           <span>{label}</span>
         </label>
       );
 
-      // ===== بيانات =====
+      /* ===== بيانات ===== */
       const DAYS = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-
-      function emptyRow(){
-        return { day:"", date:"", grade:"", period:"", absentTeacher:"", executed:"", witness:"", domain:{ basics:false, values:false, future:false } };
-      }
-      function newWeek(){
-        return {
-          id:`week-${Date.now()}`,
-          title:"تقرير تنفيذ حصص الانتظار – الأسبوع",
-          teacherName:"",
-          rows:Array.from({length:5}, (_,i)=>({ ...emptyRow(), day:DAYS[i] })),
-        };
-      }
+      const emptyRow = () => ({ day:"", date:"", grade:"", period:"", absentTeacher:"", executed:"", witness:"", domain:{ basics:false, values:false, future:false } });
+      const newWeek = () => ({
+        id:`week-${Date.now()}`,
+        title:"تقرير تنفيذ حصص الانتظار – الأسبوع",
+        teacherName:"",
+        rows:Array.from({length:5}, (_,i)=>({ ...emptyRow(), day:DAYS[i] })),
+      });
 
       function App(){
         const [weeks, setWeeks] = React.useState(()=>{
-          const saved = localStorage.getItem("report-weeks-v5-standalone");
+          const saved = localStorage.getItem("report-weeks-pages");
           if(saved){ try{ return JSON.parse(saved); } catch{ return [newWeek()]; } }
           return [newWeek()];
         });
 
         const printAreaRef = React.useRef(null);
+        React.useEffect(()=>{ localStorage.setItem("report-weeks-pages", JSON.stringify(weeks)); },[weeks]);
 
-        React.useEffect(()=>{
-          localStorage.setItem("report-weeks-v5-standalone", JSON.stringify(weeks));
-        },[weeks]);
-
-        const addWeek   = ()=> setWeeks(w=>[...w, newWeek()]);
-        const removeWeek= (id)=> setWeeks(w=>w.filter(x=>x.id!==id));
-        const addRow    = (id)=> setWeeks(w=>w.map(x=>x.id===id?{...x, rows:[...x.rows, emptyRow()]}:x));
-        const removeRow = (id, idx)=> setWeeks(w=>w.map(x=>x.id===id?{...x, rows:x.rows.filter((_,i)=>i!==idx)}:x));
+        const addWeek    = ()=> setWeeks(w=>[...w, newWeek()]);
+        const removeWeek = (id)=> setWeeks(w=>w.filter(x=>x.id!==id));
+        const addRow     = (id)=> setWeeks(w=>w.map(x=>x.id===id?{...x, rows:[...x.rows, emptyRow()]}:x));
+        const removeRow  = (id, idx)=> setWeeks(w=>w.map(x=>x.id===id?{...x, rows:x.rows.filter((_,i)=>i!==idx)}:x));
         const setWeekField = (id, field, value)=> setWeeks(w=>w.map(x=>x.id===id?{...x, [field]:value}:x));
         const setCell = (id, idx, path, value)=> {
           setWeeks(w=>w.map(week=>{
@@ -180,81 +154,54 @@
           }
           pdf.save("تقرير-حصص-الانتظار.pdf");
         };
-
-        // ربط زر التصدير العلوي
-        React.useEffect(()=>{
-          const btn = document.getElementById("exportBtn");
-          if(btn) btn.onclick = exportPDF;
-        },[weeks]);
+        // اجعل الدالة متاحة للزر العلوي
+        window.__exportPDF = exportPDF;
 
         return (
           <div className="p-4 md:p-6">
             <div className="max-w-6xl mx-auto space-y-6">
-
               {/* أدوات عامة (لا تُطبع) */}
               <div className="print-hide flex items-center justify-between gap-3">
-                <button
-                  onClick={addWeek}
-                  className="px-3 py-2 rounded-xl text-sm font-semibold text-white"
-                  style={{ background:"var(--accent)" }}
-                >
+                <button onClick={addWeek}
+                        className="px-3 py-2 rounded-xl text-sm font-semibold text-white"
+                        style={{ background:"var(--accent)" }}>
                   إضافة أسبوع
                 </button>
               </div>
 
-              {/* منطقة التصدير/الطباعة: تشمل ديباجة للطباعة + كل الجداول */}
+              {/* منطقة التصدير/الطباعة: ديباجة للطباعة + الجداول */}
               <div ref={printAreaRef} className="space-y-4">
-
-                {/* ديباجة للطباعة داخل منطقة التصدير */}
-                <div
-                  className="rounded-2xl border"
-                  style={{ background:"var(--banner-bg)", color:"var(--banner-ink)", borderColor:"var(--border)" }}
-                >
-                  <div className="px-4 py-4 md:px-6 md:py-5 flex items-center justify-between">
+                <div className="rounded-2xl border"
+                     style={{ background:"var(--banner-bg)", color:"var(--banner-ink)", borderColor:"var(--border)" }}>
+                  <div className="px-4 py-4 md:px-6 md:py-5">
                     <div className="text-base md:text-lg font-bold">الثانوية السادسة والعشرون - تبوك</div>
                   </div>
                 </div>
 
                 {weeks.map((wk)=>(
-                  <section
-                    key={wk.id}
-                    className="bg-white rounded-2xl border overflow-hidden"
-                    style={{ borderColor:"var(--border)" }}
-                  >
-                    {/* شريط علوي لكل أسبوع (اسم المعلمة + أزرار الأسبوع) - لا يُطبع */}
-                    <div
-                      className="print-hide flex flex-wrap items-center justify-between gap-3 p-4 border-b"
-                      style={{ borderColor:"var(--border)" }}
-                    >
+                  <section key={wk.id}
+                           className="bg-white rounded-2xl border overflow-hidden"
+                           style={{ borderColor:"var(--border)" }}>
+                    {/* اسم المعلمة + أزرار الأسبوع — لا تُطبع */}
+                    <div className="print-hide flex flex-wrap items-center justify-between gap-3 p-4 border-b"
+                         style={{ borderColor:"var(--border)" }}>
                       <div className="flex items-center gap-3">
                         <span className="text-sm text-slate-700">اسم المعلمة:</span>
-                        <InlineInput
-                          aria="اسم المعلمة"
-                          value={wk.teacherName || ""}
-                          onChange={(v)=>setWeekField(wk.id,"teacherName",v)}
-                        />
+                        <InlineInput aria="اسم المعلمة" value={wk.teacherName || ""} onChange={(v)=>setWeekField(wk.id,"teacherName",v)} />
                       </div>
                       <div className="flex items-center gap-2">
-                        <button
-                          onClick={()=>addRow(wk.id)}
-                          className="px-3 py-2 rounded-xl text-xs font-semibold text-white"
-                          style={{ background:"var(--accent)" }}
-                        >
-                          + صف
-                        </button>
+                        <button onClick={()=>addRow(wk.id)}
+                                className="px-3 py-2 rounded-xl text-xs font-semibold text-white"
+                                style={{ background:"var(--accent)" }}>+ صف</button>
                         {weeks.length>1 && (
-                          <button
-                            onClick={()=>removeWeek(wk.id)}
-                            className="px-3 py-2 rounded-xl text-xs font-semibold"
-                            style={{ background:"var(--accent-dark)", color:"#fff" }}
-                          >
-                            حذف الأسبوع
-                          </button>
+                          <button onClick={()=>removeWeek(wk.id)}
+                                  className="px-3 py-2 rounded-xl text-xs font-semibold"
+                                  style={{ background:"var(--accent-dark)", color:"#fff" }}>حذف الأسبوع</button>
                         )}
                       </div>
                     </div>
 
-                    {/* الجدول: بدون ألوان داخلية — حدود واضحة فقط */}
+                    {/* الجدول: حدود واضحة فقط */}
                     <div className="p-4">
                       <table className="text-sm bg-white">
                         <thead>
@@ -276,68 +223,27 @@
                             <tr key={idx}>
                               <Td className="text-slate-500">{idx+1}</Td>
                               <Td>
-                                <Select
-                                  aria="اليوم"
-                                  value={r.day}
-                                  onChange={(v)=>setCell(wk.id, idx, "day", v)}
-                                  options={["", ...["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"]]}
-                                />
+                                <Select aria="اليوم" value={r.day} onChange={(v)=>setCell(wk.id, idx, "day", v)}
+                                        options={["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"]} />
                               </Td>
-                              <Td>
-                                <input
-                                  aria-label="التاريخ"
-                                  type="date"
-                                  value={r.date}
-                                  onChange={(e)=>setCell(wk.id, idx, "date", e.target.value)}
-                                  className="w-full border rounded-lg px-2 py-1"
-                                  style={{ borderColor:"var(--border)" }}
-                                />
-                              </Td>
-                              <Td>
-                                <input
-                                  aria-label="الصف"
-                                  value={r.grade}
-                                  onChange={(e)=>setCell(wk.id, idx, "grade", e.target.value)}
-                                  className="w-full border rounded-lg px-2 py-1"
-                                  style={{ borderColor:"var(--border)" }}
-                                />
-                              </Td>
-                              <Td>
-                                <input
-                                  aria-label="الحصة"
-                                  value={r.period}
-                                  onChange={(e)=>setCell(wk.id, idx, "period", e.target.value)}
-                                  className="w-full border rounded-lg px-2 py-1"
-                                  style={{ borderColor:"var(--border)" }}
-                                />
-                              </Td>
-                              <Td>
-                                <input
-                                  aria-label="المعلمة الغائبة"
-                                  value={r.absentTeacher}
-                                  onChange={(e)=>setCell(wk.id, idx, "absentTeacher", e.target.value)}
-                                  className="w-full border rounded-lg px-2 py-1"
-                                  style={{ borderColor:"var(--border)" }}
-                                />
-                              </Td>
-                              <Td>
-                                <textarea
-                                  aria-label="ما تم تنفيذه"
-                                  value={r.executed}
-                                  onChange={(e)=>setCell(wk.id, idx, "executed", e.target.value)}
-                                  className="w-full border rounded-lg px-2 py-1 min-h-[44px]"
-                                  style={{ borderColor:"var(--border)" }}
-                                ></textarea>
-                              </Td>
-                              <Td>
-                                <textarea
-                                  aria-label="الشاهد"
-                                  value={r.witness}
-                                  onChange={(e)=>setCell(wk.id, idx, "witness", e.target.value)}
-                                  className="w-full border rounded-lg px-2 py-1 min-h-[44px]"
-                                  style={{ borderColor:"var(--border)" }}
-                                ></textarea>
-                              </Td>
+                              <Td><input aria-label="التاريخ" type="date" value={r.date}
+                                         onChange={(e)=>setCell(wk.id, idx, "date", e.target.value)}
+                                         className="w-full border rounded-lg px-2 py-1" style={{ borderColor:"var(--border)" }}/></Td>
+                              <Td><input aria-label="الصف" value={r.grade}
+                                         onChange={(e)=>setCell(wk.id, idx, "grade", e.target.value)}
+                                         className="w-full border rounded-lg px-2 py-1" style={{ borderColor:"var(--border)" }}/></Td>
+                              <Td><input aria-label="الحصة" value={r.period}
+                                         onChange={(e)=>setCell(wk.id, idx, "period", e.target.value)}
+                                         className="w-full border rounded-lg px-2 py-1" style={{ borderColor:"var(--border)" }}/></Td>
+                              <Td><input aria-label="المعلمة الغائبة" value={r.absentTeacher}
+                                         onChange={(e)=>setCell(wk.id, idx, "absentTeacher", e.target.value)}
+                                         className="w-full border rounded-lg px-2 py-1" style={{ borderColor:"var(--border)" }}/></Td>
+                              <Td><textarea aria-label="ما تم تنفيذه" value={r.executed}
+                                            onChange={(e)=>setCell(wk.id, idx, "executed", e.target.value)}
+                                            className="w-full border rounded-lg px-2 py-1 min-h-[44px]" style={{ borderColor:"var(--border)" }}></textarea></Td>
+                              <Td><textarea aria-label="الشاهد" value={r.witness}
+                                            onChange={(e)=>setCell(wk.id, idx, "witness", e.target.value)}
+                                            className="w-full border rounded-lg px-2 py-1 min-h-[44px]" style={{ borderColor:"var(--border)" }}></textarea></Td>
                               <Td>
                                 <div className="space-y-1">
                                   <Check label="المهارات الأساسية" checked={r.domain.basics} onChange={(v)=>setCell(wk.id, idx, "domain.basics", v)} />
@@ -346,13 +252,9 @@
                                 </div>
                               </Td>
                               <Td className="print-hide">
-                                <button
-                                  onClick={()=>removeRow(wk.id, idx)}
-                                  className="px-2 py-1 rounded-lg text-xs text-white"
-                                  style={{ background:"var(--accent)" }}
-                                >
-                                  حذف
-                                </button>
+                                <button onClick={()=>removeRow(wk.id, idx)}
+                                        className="px-2 py-1 rounded-lg text-xs text-white"
+                                        style={{ background:"var(--accent)" }}>حذف</button>
                               </Td>
                             </tr>
                           ))}
