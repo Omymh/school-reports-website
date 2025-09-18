@@ -1,4 +1,10 @@
-<!doctype html>
+# Build a corrected v7.1 (fix duplicate variable, tighten print/export behavior)
+from pathlib import Path, zipfile
+
+root = Path("/mnt/data/school-reports-v7_1")
+root.mkdir(parents=True, exist_ok=True)
+
+index_html = """<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
@@ -386,7 +392,6 @@
     }
 
     // Modal helpers
-    let editCtx = null;
     function openRowModal(weekId, idx){
       editCtx = { weekId, idx };
       const wk = state.weeks.find(w => w.id === weekId);
@@ -427,8 +432,8 @@
     // تصدير PDF: نظهر عناصر print-only ونخفي no-print أثناء الالتقاط
     exportBtn.addEventListener("click", async () => {
       const area = document.getElementById("exportArea");
-      area.classList.add("printing");          // يفعل قواعد الإخفاء/الإظهار للتصدير
-      await new Promise(r => setTimeout(r, 50)); // لقطة مستقرة
+      area.classList.add("printing");
+      await new Promise(r => setTimeout(r, 50));
       const canvas = await html2canvas(area, { scale: 2, useCORS: true });
       area.classList.remove("printing");
       const { jsPDF } = window.jspdf;
@@ -448,4 +453,16 @@
   </script>
 </body>
 </html>
+"""
 
+# Write files
+(root / "index.html").write_text(index_html, encoding="utf-8")
+(root / ".nojekyll").write_text("", encoding="utf-8")
+
+# Zip
+zip_path = root.with_suffix(".zip")
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    z.write(root / "index.html", "index.html")
+    z.write(root / ".nojekyll", ".nojekyll")
+
+(str(root / "index.html"), str(zip_path))
