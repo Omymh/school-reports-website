@@ -97,6 +97,13 @@
     .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
     .pdf-slim *{box-shadow:none!important}
 
+    /* إخفاء عمود "الإجراءات" وقت التصدير/الطباعة فقط */
+    .exporting th.col-actions,
+    .exporting td.col-actions { display: none !important; }
+    @media print{
+      th.col-actions, td.col-actions { display: none !important; }
+    }
+
     @media print{
       @page{size:A4 landscape; margin:10mm}
       body{background:#fff!important}
@@ -104,15 +111,6 @@
       thead th{background:#eaeaea!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
       th,td{border:1px solid #000!important;white-space:normal}
       .table-wrap::after{content:none}
-      /* إخفاء عمود "الإجراءات" وقت التصدير/الطباعة فقط */
-.exporting th.col-actions,
-.exporting td.col-actions { display: none !important; }
-
-@media print{
-  th.col-actions,
-  td.col-actions { display: none !important; }
-}
-
     }
 
     /* جوال */
@@ -124,12 +122,10 @@
       .card-h{flex-direction:column;align-items:stretch;gap:10px}
       .teacher{justify-content:center}
       .teacher input{min-width:0;width:100%}
-
       .table-wrap{border-radius:0 0 14px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
       table{min-width:980px}
       thead th{font-size:.92rem}
       th,td{padding:10px 8px;font-size:.92rem}
-      /* نُبقي عمود الإجراءات ظاهر على الجوال لكن بأزرار صغيرة */
       td.col-actions .btn{padding:6px 10px}
       .fab{display:block}
     }
@@ -276,7 +272,7 @@
         '<th class="col-idx">#</th>'+
         '<th class="col-day">اليوم</th>'+
         '<th class="col-date">التاريخ</th>'+
-        '<th class="col-grade">الصفح</th>'.replace("الصفح","الصف")+
+        '<th class="col-grade">الصف</th>'+
         '<th class="col-period">الحصة</th>'+
         '<th class="col-absent">المعلمة الغائبة</th>'+
         '<th>ما تم تنفيذه</th>'+
@@ -342,7 +338,6 @@
       save(); render(); closeRowModal();
     });
     cancelRowBtn.addEventListener("click",closeRowModal);
-    rowModal.addEventListener("click",function(e){if(e.target===rowModal) closeRowModal();});
 
     function addWeek(){state.weeks.push(newWeek()); render();}
     addWeekBtn.addEventListener("click",addWeek);
