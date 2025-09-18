@@ -29,12 +29,18 @@
       box-shadow:var(--shadow-green);margin-bottom:12px}
     .title{font-weight:800;font-size:1.6rem;text-align:center;flex:1}
 
+    /* أزرار */
     .btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
     .btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 22px rgba(40,167,69,.20)}
     .btn-primary:hover{background:var(--primary-dark)}
     .btn-ghost{background:#fff;border:1px solid var(--border);color:#204c3d}
     .btn-danger{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+    .btn-xs{padding:6px 10px;border-radius:10px;font-size:.9rem}
     .stack{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+    /* زر عائم للجوال */
+    .fab{position:fixed;right:14px;bottom:14px;z-index:60}
+    .fab .btn{border-radius:999px;padding:12px 18px;box-shadow:0 12px 26px rgba(40,167,69,.25)}
 
     /* بطاقات */
     .card{background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
@@ -53,7 +59,6 @@
       border:1px solid var(--border);border-top:0;border-radius:0 0 16px 16px;overflow:auto;
       box-shadow:var(--shadow-soft);position:relative
     }
-    /* تلميح تمرير للجوال */
     .table-wrap::after{
       content:"↔ اسحب أفقياً"; position:absolute; top:8px; left:12px; font-size:.85rem; color:#89a093;
     }
@@ -73,7 +78,7 @@
     .tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;white-space:normal}
     .tag{border:1px solid var(--border-2);background:#f7faf8;padding:4px 8px;border-radius:999px;font-size:.9rem;color:#2a5d4c}
 
-    /* عرض أعمدة منضبط */
+    /* عرض الأعمدة */
     th.col-idx{width:48px}
     th.col-day{width:110px}
     th.col-date{width:150px}
@@ -81,7 +86,7 @@
     th.col-period{width:120px}
     th.col-absent{width:180px}
     th.col-domain{width:210px}
-    th.col-actions{width:180px}
+    th.col-actions{width:170px}
 
     /* تذييل */
     .footer{margin-top:18px;background:var(--banner-bg);color:var(--banner-ink);border:1px solid var(--border);
@@ -111,13 +116,13 @@
       .teacher{justify-content:center}
       .teacher input{min-width:0;width:100%}
 
-      /* الجدول على الجوال: سحب أفقي + تصغير الخط + إخفاء الإجراءات */
       .table-wrap{border-radius:0 0 14px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-      table{min-width:980px} /* يضمن ظهور كل الأعمدة بدون ضغط */
+      table{min-width:980px}
       thead th{font-size:.92rem}
       th,td{padding:10px 8px;font-size:.92rem}
-      th.col-actions, td.col-actions{display:none}
-      .table-wrap::after{left:10px;top:6px;font-size:.8rem}
+      /* نُبقي عمود الإجراءات ظاهر على الجوال لكن بأزرار صغيرة */
+      td.col-actions .btn{padding:6px 10px}
+      .fab{display:block}
     }
 
     /* Sandbox خفي للتصدير */
@@ -157,6 +162,11 @@
     </div>
   </div>
 
+  <!-- زر عائم للجوال لإضافة أسبوع -->
+  <div class="fab no-print">
+    <button id="addWeekFab" class="btn btn-primary">+ أسبوع</button>
+  </div>
+
   <!-- نافذة إدخال صف -->
   <div id="rowModal" class="modal no-print" style="position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:16px;z-index:50">
     <div class="modal-card" style="background:#fff;border-radius:18px;box-shadow:var(--shadow);max-width:760px;width:100%;overflow:hidden;border:1px solid var(--border)">
@@ -194,9 +204,10 @@
   <script>
   (function(){
     var DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    var LS_KEY="sr-v9-weeks";
+    var LS_KEY="sr-v10-weeks";
     var weeksEl=document.getElementById("weeks");
     var addWeekBtn=document.getElementById("addWeekBtn");
+    var addWeekFab=document.getElementById("addWeekFab");
     var exportBtn=document.getElementById("exportBtn");
 
     var rowModal=document.getElementById("rowModal");
@@ -243,9 +254,9 @@
       input.value=wk.teacherName||""; input.addEventListener("input",function(){wk.teacherName=input.value;save();});
       teacherBox.appendChild(label); teacherBox.appendChild(input); left.appendChild(teacherBox);
       var right=document.createElement("div"); right.className="stack";
-      var addRowBtn=document.createElement("button"); addRowBtn.className="btn btn-primary"; addRowBtn.textContent="+ صف";
+      var addRowBtn=document.createElement("button"); addRowBtn.className="btn btn-primary btn-xs"; addRowBtn.textContent="+ صف";
       addRowBtn.addEventListener("click",function(){openRowModal(wk.id,null);}); right.appendChild(addRowBtn);
-      if(state.weeks.length>1){var delWeek=document.createElement("button"); delWeek.className="btn btn-danger"; delWeek.textContent="حذف الأسبوع";
+      if(state.weeks.length>1){var delWeek=document.createElement("button"); delWeek.className="btn btn-danger btn-xs"; delWeek.textContent="حذف الأسبوع";
         delWeek.addEventListener("click",function(){state.weeks=state.weeks.filter(function(x){return x.id!==wk.id});render();}); right.appendChild(delWeek);}
       h.appendChild(left); h.appendChild(right); wrap.appendChild(h);
 
@@ -256,13 +267,13 @@
         '<th class="col-idx">#</th>'+
         '<th class="col-day">اليوم</th>'+
         '<th class="col-date">التاريخ</th>'+
-        '<th class="col-grade">الصف</th>'+
+        '<th class="col-grade">الصفح</th>'.replace("الصفح","الصف")+
         '<th class="col-period">الحصة</th>'+
         '<th class="col-absent">المعلمة الغائبة</th>'+
         '<th>ما تم تنفيذه</th>'+
         '<th>الشاهد</th>'+
         '<th class="col-domain">المجال</th>'+
-        '<th class="col-actions no-print">إجراءات</th>'+
+        '<th class="col-actions">إجراءات</th>'+
       '</tr></thead><tbody></tbody>';
       var tbody=table.querySelector("tbody");
       if(!wk.rows||!wk.rows.length){wk.rows=DAYS.slice(1).map(function(d){return {day:d,date:"",grade:"",period:"",absent:"",executed:"",witness:"",domain:{b:false,v:false,f:false}};});}
@@ -281,9 +292,9 @@
           tr.appendChild(tdText(r.witness||""));
           var domTd=document.createElement("td"); domTd.appendChild(renderTags(r.domain)); tr.appendChild(domTd);
 
-          var act=document.createElement("td"); act.className="col-actions no-print";
-          var edit=document.createElement("button"); edit.className="btn btn-ghost"; edit.textContent="إضافة"; edit.addEventListener("click",function(){openRowModal(wk.id,iCopy);});
-          var del=document.createElement("button"); del.className="btn btn-danger"; del.textContent="حذف"; del.addEventListener("click",function(){wk.rows.splice(iCopy,1);render();});
+          var act=document.createElement("td"); act.className="col-actions";
+          var edit=document.createElement("button"); edit.className="btn btn-ghost btn-xs"; edit.textContent="إضافة"; edit.addEventListener("click",function(){openRowModal(wk.id,iCopy);});
+          var del=document.createElement("button"); del.className="btn btn-danger btn-xs"; del.textContent="حذف"; del.addEventListener("click",function(){wk.rows.splice(iCopy,1);render();});
           var stack=document.createElement("div"); stack.className="stack"; stack.appendChild(edit); stack.appendChild(del); act.appendChild(stack); tr.appendChild(act);
           tbody.appendChild(tr);
         })(i);
@@ -324,7 +335,9 @@
     cancelRowBtn.addEventListener("click",closeRowModal);
     rowModal.addEventListener("click",function(e){if(e.target===rowModal) closeRowModal();});
 
-    addWeekBtn.addEventListener("click",function(){state.weeks.push(newWeek()); render();});
+    function addWeek(){state.weeks.push(newWeek()); render();}
+    addWeekBtn.addEventListener("click",addWeek);
+    addWeekFab.addEventListener("click",addWeek);
 
     /* ======= تصدير PDF بالعرض: الصفحة الأولى = الديباجة + أول أسبوع ======= */
     exportBtn.addEventListener("click",function(){
@@ -388,4 +401,3 @@
   </script>
 </body>
 </html>
-
