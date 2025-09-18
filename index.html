@@ -4,81 +4,107 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>تقرير حصص الانتظار – الثانوية السادسة والعشرون (تبوك)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet" />
   <style>
-    :root{ --primary:#28a745; --primary-dark:#1e7e34; --ink:#263b33; --ink-soft:#4b6a5d;
-      --border:#e3ece6; --border-2:#d8e5dc; --paper:#ffffff; --page:#f6faf8;
-      --banner-bg:#e8f6ef; --banner-ink:#116e4f; --shadow:0 6px 22px rgba(0,0,0,.06);
-      --shadow-green:0 10px 30px rgba(40,167,69,.15); --shadow-soft:0 2px 10px rgba(0,0,0,.04); }
+    :root{
+      --primary:#28a745; --primary-dark:#1e7e34;
+      --ink:#263b33; --ink-soft:#4b6a5d;
+      --border:#e3ece6; --border-2:#d8e5dc;
+      --paper:#fff; --page:#f6faf8;
+      --banner-bg:#e8f6ef; --banner-ink:#116e4f;
+      --shadow:0 6px 22px rgba(0,0,0,.06);
+      --shadow-green:0 10px 30px rgba(40,167,69,.15);
+      --shadow-soft:0 2px 10px rgba(0,0,0,.04);
+    }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--page);color:var(--ink);font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.75}
+    html,body{margin:0;padding:0;background:var(--page);color:var(--ink);
+      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.75}
     .container{max-width:1180px;margin:20px auto;padding:0 14px}
-    .banner{background:var(--banner-bg);color:var(--banner-ink);border:1px solid var(--border);border-radius:20px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow-green)}
+
+    /* ديباجة العرض */
+    .banner{background:var(--banner-bg);color:var(--banner-ink);border:1px solid var(--border);
+      border-radius:20px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+      box-shadow:var(--shadow-green);margin-bottom:12px;position:relative}
     .title{font-weight:800;font-size:1.6rem;text-align:center;flex:1}
+
     .btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 22px rgba(40,167,69,.20)} .btn-primary:hover{background:var(--primary-dark)}
+    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 22px rgba(40,167,69,.20)}
+    .btn-primary:hover{background:var(--primary-dark)}
     .btn-ghost{background:#fff;border:1px solid var(--border);color:#204c3d}
-    .btn-danger{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca} .btn-danger:hover{background:#fecaca}
+    .btn-danger{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
     .stack{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+    /* بطاقات الأسابيع */
     .card{background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
     .card + .card{margin-top:16px}
-    .card-h{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,#fbfdfc,#fff);border-radius:18px 18px 0 0;position:relative;z-index:1}
+    .card-h{padding:14px 16px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,#fbfdfc,#fff)}
     .card-b{padding:16px}
+
     .teacher{display:flex;align-items:center;gap:10px}
     .teacher label{color:var(--ink-soft);font-weight:700;white-space:nowrap}
     .teacher input{min-width:260px;border:1px solid var(--border-2);border-radius:10px;padding:10px 14px;text-align:center;outline:0}
     .teacher input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(40,167,69,.10)}
+
+    /* جدول التقرير */
     .table-wrap{border:1px solid var(--border);border-top:0;border-radius:0 0 16px 16px;overflow:hidden;box-shadow:var(--shadow-soft)}
-    table{border-collapse:separate;border-spacing:0;width:100%;background:var(--paper)}
-    thead th{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#e9f7ef,#f6fbf8);color:#1d6a4f;font-weight:800;border-bottom:1px solid var(--border);text-align:center}
-    th,td{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:12px 10px;text-align:center;vertical-align:middle}
+    table{border-collapse:separate;border-spacing:0;width:100%;background:var(--paper);table-layout:fixed} /* مهم للجوال */
+    thead th{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,#e9f7ef,#f6fbf8);color:#1d6a4f;font-weight:800;border-bottom:1px solid var(--border);text-align:center}
+    th,td{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:12px 10px;text-align:center;vertical-align:middle;word-wrap:break-word;white-space:normal}
     th:first-child,td:first-child{border-right:none}
-    tbody tr:nth-child(even) td{background:#fbfdfc} tbody tr:hover td{background:#f4faf6}
+    tbody tr:nth-child(even) td{background:#fbfdfc}
+    tbody tr:hover td{background:#f4faf6}
     .tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
     .tag{border:1px solid var(--border-2);background:#f7faf8;padding:4px 8px;border-radius:999px;font-size:.9rem;color:#2a5d4c}
     .week-title{font-weight:800;color:#2b6f57}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
-    .modal.show{display:flex}
-    .modal-card{background:#fff;border-radius:18px;box-shadow:var(--shadow);max-width:760px;width:100%;overflow:hidden;border:1px solid var(--border)}
-    .modal-h{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:800;color:#2b6f57}
-    .modal-b{padding:16px}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .field{display:flex;flex-direction:column;gap:6px}
-    .field label{font-weight:700;color:var(--ink-soft)}
-    .field input,.field select,.field textarea{border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0}
-    .field textarea{min-height:70px;text-align:right}
-    .checks{display:flex;gap:8px;flex-wrap:wrap}
-    .checks label{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#f7faf8}
+
+    /* تذييل */
+    .footer{margin-top:18px;background:var(--banner-bg);color:var(--banner-ink);border:1px solid var(--border);
+      border-radius:18px;padding:14px 16px;text-align:center;box-shadow:var(--shadow-green)}
+
+    /* طباعة/تصدير */
     .no-print{display:initial} .print-only{display:none}
-    .printing .print-only{display:flex !important} .printing .no-print{display:none !important}
-    @media print{ .card{page-break-after:always} 
-      .no-print{display:none!important} .print-only{display:flex!important} body{background:#fff!important}
-      .container{max-width:none;margin:0;padding:0} .banner, .card{border-radius:0;box-shadow:none;border:2px solid #000}
+    .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
+    .pdf-slim *{box-shadow:none!important} /* تخفيف الظلال أثناء الالتقاط */
+
+    /* صفحات الطباعة بالعرض */
+    @media print{
+      @page{size:A4 landscape; margin:10mm}
+      body{background:#fff!important}
+      .card{page-break-after:always}
       thead th{background:#eaeaea!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      th,td{border:1px solid #000!important} table{border:2px solid #000}
+      th,td{border:1px solid #000!important}
     }
-    .footer{margin-top:18px;background:var(--banner-bg);color:var(--banner-ink);border:1px solid var(--border);border-radius:18px;padding:14px 16px;text-align:center;box-shadow:var(--shadow-green)}
-    /* Mobile fixes */
-    @media (max-width: 640px) { .banner{box-shadow:0 6px 18px rgba(40,167,69,.12)} .card{border-radius:14px} .card-h{border-radius:14px 14px 0 0} .table-wrap{border-radius:0 0 14px 14px}
+
+    /* جوال */
+    @media (max-width:640px){
       .container{padding:0 10px}
       .banner{flex-direction:column;align-items:center;text-align:center;gap:12px}
       .banner .title{font-size:1.35rem}
       .banner .stack{width:100%;justify-content:center}
       .card-h{flex-direction:column;align-items:stretch;gap:10px}
-      .week-title{text-align:center}
       .teacher{justify-content:center}
       .teacher input{min-width:0;width:100%}
-      .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px}
+      .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 14px 14px}
       table{min-width:720px}
-      thead th{font-size:0.95rem}
-      th,td{padding:10px 8px;font-size:0.95rem}
+      thead th{font-size:.95rem}
+      th,td{padding:10px 8px;font-size:.95rem}
     }
+
+    /* مساحة عمل خفية للتصدير بقياس ثابت A4 Landscape (عرض 1200px) */
+    #printSandbox{position:fixed;left:-99999px;top:0;width:1200px;background:#fff;pointer-events:none;opacity:0}
+    #printSandbox .sheet{margin:0 0 18px 0;border:1px solid #eee;border-radius:12px;padding:0}
+    #printSandbox .sheet .card{border-radius:0;box-shadow:none;border:0}
+    #printSandbox .sheet .card-h{border-bottom:1px solid #ddd}
   </style>
+
+  <!-- مكتبات التصدير -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="container">
+    <!-- ديباجة العرض -->
     <div class="banner no-print">
       <div class="title">الثانوية السادسة والعشرون - تبوك</div>
       <div class="stack">
@@ -86,47 +112,50 @@
         <button id="exportBtn" class="btn btn-primary">تصدير PDF</button>
       </div>
     </div>
+
+    <!-- منطقة التصدير -->
     <div id="exportArea" style="margin-top:14px">
       <div class="banner print-only" style="box-shadow:var(--shadow-green)">
         <div class="title">الثانوية السادسة والعشرون - تبوك</div>
-        <div style="width:120px"></div>
       </div>
       <div id="weeks"></div>
     </div>
+
+    <!-- تذييل -->
     <div class="footer no-print">
       <div>مديرة المدرسة: <strong>أماني آل عبشان</strong></div>
       <div>تصميم الهيئة الإدارية: <strong>عيدة صلاح</strong>، <strong>منيرة العمراني</strong></div>
     </div>
   </div>
 
-  <div id="rowModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="rowModalTitle">
-    <div class="modal-card">
-      <div class="modal-h" id="rowModalTitle">إدخال بيانات الصف</div>
-      <div class="modal-b">
-        <div class="grid">
+  <!-- نافذة إدخال صف -->
+  <div id="rowModal" class="modal no-print" style="position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:16px;z-index:50">
+    <div class="modal-card" style="background:#fff;border-radius:18px;box-shadow:var(--shadow);max-width:760px;width:100%;overflow:hidden;border:1px solid var(--border)">
+      <div class="modal-h" style="padding:14px 16px;border-bottom:1px solid var(--border);font-weight:800;color:#2b6f57">إدخال بيانات الصف</div>
+      <div class="modal-b" style="padding:16px">
+        <div class="grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
           <div class="field"><label>اليوم</label>
-            <select id="f_day">
-              <option value=""></option>
-              <option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option>
+            <select id="f_day" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0">
+              <option value=""></option><option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option>
             </select>
           </div>
-          <div class="field"><label>التاريخ</label><input id="f_date" type="date"></div>
-          <div class="field"><label>الصف</label><input id="f_grade"></div>
-          <div class="field"><label>الحصة</label><input id="f_period"></div>
-          <div class="field"><label>المعلمة الغائبة</label><input id="f_absent"></div>
-          <div class="field" style="grid-column:1/-1"><label>ما تم تنفيذه</label><textarea id="f_exec"></textarea></div>
-          <div class="field" style="grid-column:1/-1"><label>الشاهد</label><textarea id="f_witness"></textarea></div>
+          <div class="field"><label>التاريخ</label><input id="f_date" type="date" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0"></div>
+          <div class="field"><label>الصف</label><input id="f_grade" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0"></div>
+          <div class="field"><label>الحصة</label><input id="f_period" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0"></div>
+          <div class="field"><label>المعلمة الغائبة</label><input id="f_absent" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0"></div>
+          <div class="field" style="grid-column:1/-1"><label>ما تم تنفيذه</label><textarea id="f_exec" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;min-height:70px;text-align:right;outline:0"></textarea></div>
+          <div class="field" style="grid-column:1/-1"><label>الشاهد</label><textarea id="f_witness" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;min-height:70px;text-align:right;outline:0"></textarea></div>
           <div class="field" style="grid-column:1/-1">
             <label>المجال</label>
-            <div class="checks">
-              <label><input type="checkbox" id="c_basics"> المهارات الأساسية</label>
-              <label><input type="checkbox" id="c_values"> القيم والمواطنة الصالحة</label>
-              <label><input type="checkbox" id="c_future"> مهارات المستقبل</label>
+            <div class="checks" style="display:flex;gap:8px;flex-wrap:wrap">
+              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_basics"> المهارات الأساسية</label>
+              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_values"> القيم والمواطنة الصالحة</label>
+              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_future"> مهارات المستقبل</label>
             </div>
           </div>
         </div>
       </div>
-      <div class="modal-f">
+      <div class="modal-f" style="display:flex;gap:10px;justify-content:flex-start;padding:14px 16px">
         <button id="saveRowBtn" class="btn btn-primary">حفظ</button>
         <button id="cancelRowBtn" class="btn btn-ghost">إلغاء</button>
       </div>
@@ -136,7 +165,7 @@
   <script>
   (function(){
     var DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    var LS_KEY="sr-v7-weeks";
+    var LS_KEY="sr-v8-weeks";
     var weeksEl=document.getElementById("weeks");
     var addWeekBtn=document.getElementById("addWeekBtn");
     var exportBtn=document.getElementById("exportBtn");
@@ -181,8 +210,8 @@
       var left=document.createElement("div"); left.className="stack";
       var title=document.createElement("div"); title.className="week-title"; title.textContent=wk.title+" #"+(wIdx+1); left.appendChild(title);
       var teacherBox=document.createElement("div"); teacherBox.className="teacher";
-      var label=document.createElement("label"); label.textContent="اسم المعلمة:";
-      var input=document.createElement("input"); input.value=wk.teacherName||""; input.addEventListener("input",function(){wk.teacherName=input.value;save();});
+      var label=document.createElement("label"); label.textContent="اسم المعلمة:"; var input=document.createElement("input");
+      input.value=wk.teacherName||""; input.addEventListener("input",function(){wk.teacherName=input.value;save();});
       teacherBox.appendChild(label); teacherBox.appendChild(input); left.appendChild(teacherBox);
       var right=document.createElement("div"); right.className="stack";
       var addRowBtn=document.createElement("button"); addRowBtn.className="btn btn-primary"; addRowBtn.textContent="+ صف";
@@ -195,9 +224,11 @@
       var tableWrap=document.createElement("div"); tableWrap.className="table-wrap";
       var table=document.createElement("table");
       table.innerHTML='<thead><tr>'+
-        '<th>#</th><th>اليوم</th><th>التاريخ</th><th>الصف</th><th>الحصة</th>'+
-        '<th>المعلمة الغائبة</th><th>ما تم تنفيذه</th><th>الشاهد</th><th>المجال</th>'+
-        '<th class="no-print">إجراءات</th>'+
+        '<th style="width:48px">#</th><th style="width:120px">اليوم</th><th style="width:150px">التاريخ</th>'+
+        '<th style="width:130px">الصف</th><th style="width:130px">الحصة</th>'+
+        '<th style="width:180px">المعلمة الغائبة</th>'+
+        '<th>ما تم تنفيذه</th><th>الشاهد</th><th style="width:220px">المجال</th>'+
+        '<th class="no-print" style="width:180px">إجراءات</th>'+
       '</tr></thead><tbody></tbody>';
       var tbody=table.querySelector("tbody");
       if(!wk.rows||!wk.rows.length){wk.rows=DAYS.slice(1).map(function(d){return {day:d,date:"",grade:"",period:"",absent:"",executed:"",witness:"",domain:{b:false,v:false,f:false}};});}
@@ -236,9 +267,9 @@
       f_day.value=r.day||""; f_date.value=r.date||""; f_grade.value=r.grade||""; f_period.value=r.period||"";
       f_absent.value=r.absent||""; f_exec.value=r.executed||""; f_witness.value=r.witness||"";
       c_basics.checked=!!(r.domain&&r.domain.b); c_values.checked=!!(r.domain&&r.domain.v); c_future.checked=!!(r.domain&&r.domain.f);
-      rowModal.classList.add("show");
+      rowModal.style.display="flex";
     }
-    function closeRowModal(){rowModal.classList.remove("show"); editCtx=null;}
+    function closeRowModal(){rowModal.style.display="none"; editCtx=null;}
     saveRowBtn.addEventListener("click",function(){
       if(!editCtx) return;
       var wk=state.weeks.filter(function(w){return w.id===editCtx.weekId})[0];
@@ -250,21 +281,73 @@
     rowModal.addEventListener("click",function(e){if(e.target===rowModal) closeRowModal();});
 
     addWeekBtn.addEventListener("click",function(){state.weeks.push(newWeek()); render();});
+
+    /* ======= تصدير PDF بالعرض مع صندوق خفي بقياس ثابت ======= */
     exportBtn.addEventListener("click",function(){
-      var area=document.getElementById("exportArea"); area.classList.add("printing");
-      setTimeout(function(){
-        html2canvas(area,{scale:2,useCORS:true}).then(function(canvas){
-          area.classList.remove("printing");
-          var pdf=new window.jspdf.jsPDF("l","mm","a4");
-          var img=canvas.toDataURL("image/jpeg",0.95);
-          var pageW=210,pageH=297,imgW=pageW,imgH=(canvas.height*imgW)/canvas.width;
-          var heightLeft=imgH,pos=0;
-          pdf.addImage(img,"JPEG",0,pos,imgW,imgH,undefined,"FAST");
-          heightLeft-=pageH;
-          while(heightLeft>0){pos=heightLeft-imgH; pdf.addPage(); pdf.addImage(img,"JPEG",0,pos,imgW,imgH,undefined,"FAST"); heightLeft-=pageH;}
+      // افتح تبويب جديد تزامنيًا (أضمن للجوال)
+      var newTab = window.open("", "_blank");
+      if(!newTab){ alert("رجاءً فعّل النوافذ المنبثقة مؤقتًا للتصدير."); return; }
+
+      var area = document.getElementById("exportArea");
+      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth<700;
+
+      // أنشئ Sandbox خفي بعرض 1200px (قريب من A4 Landscape)
+      var sandbox = document.createElement("div");
+      sandbox.id = "printSandbox"; document.body.appendChild(sandbox);
+      sandbox.innerHTML = ""; // نظافة
+
+      // اجمع الأقسام: الديباجة الخاصة بالطباعة + كل أسبوع
+      var sections = Array.prototype.slice.call(area.querySelectorAll(".print-only, .card"));
+
+      // انسخ إلى Sandbox كصفحات مستقلة (sheet)
+      sections.forEach(function(sec){
+        var sheet = document.createElement("div");
+        sheet.className = "sheet";
+        // استنساخ عميق
+        sheet.appendChild(sec.cloneNode(true));
+        sandbox.appendChild(sheet);
+      });
+
+      // إعداد نمط التصدير
+      document.body.classList.add("exporting","pdf-slim");
+
+      // توليد PDF Landscape
+      var pdf = new window.jspdf.jsPDF("l","mm","a4");
+      var pageW=297, pageH=210;
+
+      // مقياس مناسب للجوال (أخف) والابتوب (أوضح)
+      var scale = isMobile ? 1.1 : 1.5;
+
+      // التقط كل صفحة على حدة
+      (async function(){
+        var first=true;
+        for(var i=0;i<sandbox.children.length;i++){
+          var page = sandbox.children[i];
+          /* eslint-disable no-await-in-loop */
+          var canvas = await html2canvas(page,{scale:scale,backgroundColor:"#ffffff",useCORS:true,windowWidth:1200});
+          var img = canvas.toDataURL("image/jpeg",0.92);
+          // ليملأ عرض الصفحة بالضبط
+          var imgW=pageW, imgH=(canvas.height*imgW)/canvas.width;
+          if(!first) pdf.addPage();
+          pdf.addImage(img,"JPEG",0,0,imgW,imgH,undefined,"FAST");
+          first=false;
+          // تحرير ذاكرة الكانفس
+          canvas.width=0; canvas.height=0;
+        }
+
+        // تنظيف
+        document.body.classList.remove("exporting","pdf-slim");
+        sandbox.remove();
+
+        // عرض في التبويب الجديد
+        try{
+          var blobUrl = pdf.output("bloburl");
+          newTab.location.href = blobUrl;
+          setTimeout(function(){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }, 60000);
+        }catch(e){
           pdf.save("تقرير-حصص-الانتظار.pdf");
-        });
-      },50);
+        }
+      })();
     });
 
     render();
