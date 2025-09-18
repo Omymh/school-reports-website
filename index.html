@@ -36,6 +36,7 @@
 
     .container{max-width:1180px;margin:18px auto;padding:0 14px}
 
+    /* ديباجة العرض */
     .banner{background:var(--banner-bg);color:var(--banner-ink);border:1px solid var(--border);border-radius:18px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow-soft)}
     .title{font-weight:800;font-size:1.4rem;text-align:center;flex:1}
 
@@ -85,15 +86,35 @@
     .checks label{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#f7faf8}
     .modal-f{padding:14px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-start;gap:10px}
 
+    /* print helpers */
+    .no-print{display:initial}
+    .print-only{display:none}
+    /* أثناء التصدير نُظهر عناصر print-only ونخفي no-print */
+    .printing .print-only{display:flex !important}
+    .printing .no-print{display:none !important}
+
     /* طباعة: الديباجة + جميع الجداول فقط */
     @media print{
       .no-print{display:none!important}
+      .print-only{display:flex!important}
       body{background:#fff!important}
       .container{max-width:none;margin:0;padding:0}
       .banner, .card{border-radius:0;box-shadow:none}
       thead th{background:#eaeaea!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
       th,td{border:1px solid #000!important}
       table{border:2px solid #000}
+    }
+
+    /* تذليل الموقع */
+    .footer{
+      margin-top:16px;
+      background:var(--banner-bg);
+      color:var(--banner-ink);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 16px;
+      text-align:center;       /* الأسماء بالمنتصف */
+      box-shadow:var(--shadow-soft);
     }
   </style>
 
@@ -104,7 +125,7 @@
 <body>
   <div class="container">
 
-    <!-- ديباجة العرض -->
+    <!-- ديباجة العرض (مرئيّة على الشاشة فقط) -->
     <div class="banner no-print">
       <div class="title">الثانوية السادسة والعشرون - تبوك</div>
       <div class="stack">
@@ -113,9 +134,10 @@
       </div>
     </div>
 
-    <!-- منطقة التصدير/الطباعة: تضم ديباجة للطباعة + كل الأسابيع -->
+    <!-- منطقة التصدير/الطباعة: تضم ديباجة للطباعة فقط + كل الأسابيع -->
     <div id="exportArea" style="margin-top:14px">
-      <div class="banner" style="box-shadow:none">
+      <!-- هذه الديباجة للطباعة/التصدير فقط، ومخفية في العرض -->
+      <div class="banner print-only" style="box-shadow:none">
         <div class="title">الثانوية السادسة والعشرون - تبوك</div>
         <div style="width:120px"></div>
       </div>
@@ -123,9 +145,8 @@
       <div id="weeks"></div>
     </div>
 
-    <!-- تذليل (عرض فقط) -->
-    <div class="no-print" style="margin-top:16px;color:#4f6b61">
-      <hr style="border:none;border-top:1px solid var(--border)"/>
+    <!-- تذليل (أخضر وبالمنتصف – عرض فقط) -->
+    <div class="footer no-print">
       <div>مديرة المدرسة: <strong>أماني آل عبشان</strong></div>
       <div>تصميم الهيئة الإدارية: <strong>عيدة صلاح</strong>، <strong>منيرة العمراني</strong></div>
     </div>
@@ -310,7 +331,7 @@
       `;
       const tbody = table.querySelector("tbody");
 
-      // ensure there are rows
+      // ensure rows exist
       if (!wk.rows || !wk.rows.length){
         wk.rows = DAYS.slice(1).map(d => ({day:d,date:"",grade:"",period:"",absent:"",executed:"",witness:"",domain:{b:false,v:false,f:false}}));
       }
@@ -356,21 +377,16 @@
       return wrap;
     }
 
-    function tdText(t){
-      const td = document.createElement("td");
-      td.textContent = t;
-      return td;
-    }
+    function tdText(t){ const td=document.createElement("td"); td.textContent=t; return td; }
     function renderTags(arr){
       const wrap = document.createElement("div"); wrap.className = "tags";
       if (!arr.length){ wrap.textContent = "—"; return wrap; }
-      arr.forEach(x => {
-        const s = document.createElement("span"); s.className="tag"; s.textContent=x; wrap.appendChild(s);
-      });
+      arr.forEach(x => { const s=document.createElement("span"); s.className="tag"; s.textContent=x; wrap.appendChild(s); });
       return wrap;
     }
 
     // Modal helpers
+    let editCtx = null;
     function openRowModal(weekId, idx){
       editCtx = { weekId, idx };
       const wk = state.weeks.find(w => w.id === weekId);
@@ -389,12 +405,9 @@
 
       rowModal.classList.add("show");
     }
-    function closeRowModal(){
-      rowModal.classList.remove("show");
-      editCtx = null;
-    }
+    function closeRowModal(){ rowModal.classList.remove("show"); editCtx = null; }
 
-    saveRowBtn.addEventListener("click", () => {
+    document.getElementById("saveRowBtn").addEventListener("click", () => {
       if (!editCtx) return;
       const wk = state.weeks.find(w => w.id === editCtx.weekId);
       const obj = {
@@ -402,19 +415,22 @@
         absent: f_absent.value, executed: f_exec.value, witness: f_witness.value,
         domain: { b: c_basics.checked, v: c_values.checked, f: c_future.checked }
       };
-      if (editCtx.idx == null) wk.rows.push(obj);
-      else wk.rows[editCtx.idx] = obj;
+      if (editCtx.idx == null) wk.rows.push(obj); else wk.rows[editCtx.idx] = obj;
       save(); render(); closeRowModal();
     });
-    cancelRowBtn.addEventListener("click", closeRowModal);
+    document.getElementById("cancelRowBtn").addEventListener("click", closeRowModal);
     rowModal.addEventListener("click", (e)=>{ if (e.target === rowModal) closeRowModal(); });
 
-    // Add week / Export
+    // إضافة أسبوع
     addWeekBtn.addEventListener("click", () => { state.weeks.push(newWeek()); render(); });
 
+    // تصدير PDF: نظهر عناصر print-only ونخفي no-print أثناء الالتقاط
     exportBtn.addEventListener("click", async () => {
       const area = document.getElementById("exportArea");
+      area.classList.add("printing");          // يفعل قواعد الإخفاء/الإظهار للتصدير
+      await new Promise(r => setTimeout(r, 50)); // لقطة مستقرة
       const canvas = await html2canvas(area, { scale: 2, useCORS: true });
+      area.classList.remove("printing");
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF("p","mm","a4");
       const img = canvas.toDataURL("image/jpeg", 0.95);
@@ -432,3 +448,4 @@
   </script>
 </body>
 </html>
+
