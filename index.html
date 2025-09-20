@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>تقرير حصص الانتظار – الثانوية السادسة والعشرون (تبوك)</title>
 
-  <!-- خط -->
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet" />
 
   <style>
@@ -71,6 +70,7 @@
     .witness h4{margin:0 0 8px;font-weight:800}
     .w-grid{display:flex;gap:10px;flex-wrap:wrap}
     .w-grid .slot{width:100px;height:100px;border:1px solid var(--border-2);border-radius:10px;overflow:hidden;background:#f7faf8;display:flex;align-items:center;justify-content:center}
+    .w-grid .slot.empty{background:#f7faf8}
     .w-grid img{width:100%;height:100%;object-fit:cover;display:block}
     .w-actions{display:flex;gap:8px;align-items:center;margin-top:8px}
 
@@ -81,7 +81,6 @@
     /* طباعة/تصدير */
     .no-print{display:initial} .print-only{display:none}
     .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
-    /* إخفاء "الإجراءات" في التصدير/الطباعة */
     .exporting th.col-actions, .exporting td.col-actions { display:none!important; }
     @media print{ th.col-actions, td.col-actions { display:none!important; } }
 
@@ -109,7 +108,7 @@
     #printSandbox{position:fixed;left:-99999px;top:0;width:1200px;background:#fff;pointer-events:none;opacity:0}
     #printSandbox .sheet{margin:0 0 18px 0;border:1px solid #eee;border-radius:12px;overflow:hidden}
   </style>
-  <!-- مكتبات التصدير -->
+
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
@@ -180,7 +179,6 @@
 
   <script>
   (function(){
-    // فfallback لصورة الديباجة
     function attachFallback(img){
       img.addEventListener('error', function(){
         if(this.src.endsWith('26.png')) this.src='26.jpg';
@@ -191,7 +189,7 @@
     attachFallback(document.getElementById('printBannerImg'));
 
     const DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    const LS_KEY="sr-v18-weeks";
+    const LS_KEY="sr-v19-weeks";
 
     const weeksEl=document.getElementById("weeks");
     document.getElementById("addWeekBtn").addEventListener("click",()=>{state.weeks.push(newWeek()); render();});
@@ -239,7 +237,7 @@
       const inp=document.createElement("input"); inp.value=wk.teacherName||""; inp.addEventListener("input",()=>{wk.teacherName=inp.value; save();});
       teacherBox.appendChild(inp); left.appendChild(title); left.appendChild(teacherBox);
       const right=document.createElement("div"); right.className="stack";
-      const addRow=document.createElement("button"); addRow.className="btn btn-primary btn-xs"; addRow.textContent="+ صف"; addRow.onclick=()=>openRowModal(wk.id,null);
+      const addRow=document.createElement("button"); addRow.className="btn btn-primary btn-xs"; addRow.textContent="+ صف"; addRow.onclick=()=>openRowModal(wk.id,i=null);
       right.appendChild(addRow);
       if(state.weeks.length>1){ const delW=document.createElement("button"); delW.className="btn btn-danger btn-xs"; delW.textContent="حذف الأسبوع"; delW.onclick=()=>{state.weeks=state.weeks.filter(w=>w.id!==wk.id); render();}; right.appendChild(delW); }
       h.appendChild(left); h.appendChild(right); sec.appendChild(h);
@@ -281,14 +279,16 @@
 
       tWrap.appendChild(tbl); b.appendChild(tWrap);
 
-      // Witness area (images below the table)
+      // Witness area
       const wBox=document.createElement("div"); wBox.className="witness";
-      const titleW=document.createElement("h4"); titleW.textContent="الشواهد (حتى 3 صور)"; wBox.appendChild(titleW);
+      const titleW=document.createElement("h4"); titleW.textContent="الشواهد"; wBox.appendChild(titleW);
       const grid=document.createElement("div"); grid.className="w-grid";
-      // slots
+
+      // أنشئ 3 خانات؛ الفارغة تأخذ class "empty" (سنخفيها من التقرير)
       for(let i=0;i<3;i++){
         const slot=document.createElement("div"); slot.className="slot";
         if(wk.witnesses[i]){ const img=document.createElement("img"); img.src=wk.witnesses[i]; slot.appendChild(img); }
+        else{ slot.classList.add("empty"); }
         grid.appendChild(slot);
       }
       wBox.appendChild(grid);
@@ -322,8 +322,8 @@
       rowModal.style.display="flex";
     }
     function closeRow(){rowModal.style.display="none"; editCtx=null;}
-    document.getElementById("cancelRowBtn").onclick=closeRow;
-    document.getElementById("saveRowBtn").onclick=function(){
+    cancelRowBtn.onclick=closeRow;
+    saveRowBtn.onclick=function(){
       if(!editCtx) return;
       const wk=state.weeks.find(w=>w.id===editCtx.weekId);
       const obj={day:f_day.value,date:f_date.value,grade:f_grade.value,period:f_period.value,absent:f_absent.value,executed:f_exec.value,domain:{b:c_basics.checked,v:c_values.checked,f:c_future.checked}};
@@ -338,14 +338,15 @@
       const sandbox=document.createElement("div");
       sandbox.id="printSandbox"; document.body.appendChild(sandbox);
 
-      // صفحة 1: الديباجة + أول أسبوع (إن وجد)
       const cards=[...area.querySelectorAll(".card")];
+
+      // صفحة 1: الديباجة + أول أسبوع
       const first=document.createElement("div"); first.className="sheet";
       first.appendChild(banner.cloneNode(true));
       if(cards[0]) first.appendChild(cleanForExport(cards[0].cloneNode(true)));
       sandbox.appendChild(first);
 
-      // باقي الأسابيع
+      // بقية الأسابيع
       for(let i=1;i<cards.length;i++){
         const s=document.createElement("div"); s.className="sheet";
         s.appendChild(cleanForExport(cards[i].cloneNode(true)));
@@ -370,23 +371,27 @@
       sandbox.remove();
 
       try{
-        // على الجوال بعض المتصفحات تفضّل فتح الملف في تبويب جديد
         const blob=pdf.output("blob");
         const url=URL.createObjectURL(blob);
         const win=window.open(url,"_blank");
         if(!win){ pdf.save("تقرير-حصص-الانتظار.pdf"); }
-        // تحرير لاحق
         setTimeout(()=>{ try{URL.revokeObjectURL(url);}catch(e){} }, 5*60*1000);
       }catch(e){
         pdf.save("تقرير-حصص-الانتظار.pdf");
       }
     }
 
+    // تنظيف نسخة التصدير:
     function cleanForExport(card){
-      // إزالة عمود الإجراءات نهائيًا
+      // احذف عمود الإجراءات نهائيًا
       card.querySelectorAll('th.col-actions, td.col-actions').forEach(el=>el.remove());
-      // إزالة مدخلات الشواهد (الإضافة/مسح) والإبقاء على الصور فقط
+      // احذف أدوات رفع الشواهد
       card.querySelectorAll('.w-actions').forEach(el=>el.remove());
+      // اخفِ الخانات الفارغة (مثلاً لو صورتين فقط لا نُظهر المربع الثالث)
+      card.querySelectorAll('.w-grid .slot.empty').forEach(el=>el.remove());
+      // إن لم تبق أي صورة، احذف قسم الشواهد بالكامل
+      const w=card.querySelector('.witness');
+      if(w && w.querySelectorAll('img').length===0){ w.remove(); }
       return card;
     }
 
@@ -395,3 +400,4 @@
   </script>
 </body>
 </html>
+
