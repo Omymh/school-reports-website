@@ -13,6 +13,7 @@
       --paper:#fff; --page:#f6faf8;
       --shadow:0 6px 22px rgba(0,0,0,.06);
       --shadow-soft:0 2px 10px rgba(0,0,0,.04);
+      --banner-ring:#e3efe9;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--page);color:var(--ink);
@@ -20,7 +21,12 @@
 
     .container{max-width:1180px;margin:20px auto;padding:0 16px}
 
-    /* شريط تحكم بسيط بدل الديباجة */
+    /* ديباجة مرئية في الموقع */
+    .site-banner{background:#fff;border:1px solid var(--border-2);border-radius:16px;padding:10px;box-shadow:var(--shadow-soft);margin-bottom:12px}
+    .site-banner .img-wrap{background:linear-gradient(180deg,#f7fbf9,#fff);border:1px solid var(--banner-ring);border-radius:12px;padding:8px}
+    .site-banner img{display:block;max-width:100%;height:auto;margin:0 auto;border-radius:8px}
+
+    /* شريط التحكم */
     .toolbar{background:#fff;border:1px solid var(--border-2);border-radius:14px;padding:12px 14px;
       display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:var(--shadow-soft);margin-bottom:12px}
     .toolbar .title{font-weight:800}
@@ -63,12 +69,16 @@
     .tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;white-space:normal}
     .tag{border:1px solid var(--border-2);background:#f8faf9;padding:4px 8px;border-radius:999px;font-size:.9rem;color:#2a5d4c}
 
+    /* تذييل الموقع (يظهر في الموقع فقط) */
+    .footer{margin-top:14px;background:#e9f6ef;border:1px solid var(--border-2);border-radius:14px;padding:10px 12px;text-align:center}
+    .footer small{display:block;color:#215843}
+
     /* طباعة/تصدير */
     .no-print{display:initial} .print-only{display:none}
     .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
     .pdf-slim *{box-shadow:none!important}
 
-    /* إخفاء عمود "الإجراءات" بالتقرير فقط (ونسخ الـSandbox نحذفها برمجيًا أيضًا) */
+    /* إخفاء عمود "الإجراءات" بالتقرير فقط (وسنحذفه من الـSandbox أيضًا) */
     .exporting th.col-actions, .exporting td.col-actions { display:none!important; }
     @media print{ th.col-actions, td.col-actions { display:none!important; } }
 
@@ -97,7 +107,7 @@
     #printSandbox .sheet{margin:0 0 18px 0;border:1px solid #eee;border-radius:12px;padding:0}
     #printSandbox .sheet .card{border-radius:0;box-shadow:none;border:0}
     #printSandbox .sheet .card-h{border-bottom:1px solid #ddd}
-    #printBannerImg{max-width:100%;height:auto;display:block;margin:0 auto}
+    #printBannerImg, #siteBannerImg{max-width:100%;height:auto;display:block;margin:0 auto}
   </style>
 
   <!-- مكتبات التصدير -->
@@ -106,7 +116,15 @@
 </head>
 <body>
   <div class="container">
-    <!-- شريط التحكم (بدون ديباجة لونية) -->
+
+    <!-- ديباجة مرئية في الموقع -->
+    <div class="site-banner no-print">
+      <div class="img-wrap">
+        <img id="siteBannerImg" src="26.png" alt="ديباجة التقرير (الموقع)" />
+      </div>
+    </div>
+
+    <!-- شريط التحكم -->
     <div class="toolbar no-print">
       <div class="title">تقرير حصص الانتظار</div>
       <div class="stack">
@@ -117,11 +135,17 @@
 
     <!-- منطقة التصدير -->
     <div id="exportArea">
-      <!-- ديباجة التقرير = صورة 26 (تظهر في التقرير فقط) -->
+      <!-- ديباجة التقرير = صورة 26 (تظهر في التقرير) -->
       <div class="print-only" id="printBanner">
-        <img id="printBannerImg" src="26.png" alt="ديباجة التقرير" />
+        <img id="printBannerImg" src="26.png" alt="ديباجة التقرير (التقرير)" />
       </div>
       <div id="weeks"></div>
+    </div>
+
+    <!-- تذييل الموقع فقط -->
+    <div class="footer no-print">
+      <small>مديرة المدرسة: <strong>أماني آل عبشان</strong></small>
+      <small>تصميم الهيئة الإدارية: <strong>عيدة صلاح</strong>، <strong>منيرة العمراني</strong></small>
     </div>
   </div>
 
@@ -161,15 +185,18 @@
 
   <script>
   (function(){
-    // بدّل تلقائيًا إلى 26.jpg إذا 26.png غير موجودة
-    var bannerImg=document.getElementById('printBannerImg');
-    bannerImg.addEventListener('error', function(){
-      if(this.src.endsWith('26.png')) this.src='26.jpg';
-      else if(this.src.endsWith('26.jpg')) this.src='26.jpeg';
-    });
+    // فallback للصورة في الموقع والتقرير
+    function attachFallback(imgEl){
+      imgEl.addEventListener('error', function(){
+        if(this.src.endsWith('26.png')) this.src='26.jpg';
+        else if(this.src.endsWith('26.jpg')) this.src='26.jpeg';
+      });
+    }
+    attachFallback(document.getElementById('siteBannerImg'));
+    attachFallback(document.getElementById('printBannerImg'));
 
     var DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    var LS_KEY="sr-v11-weeks";
+    var LS_KEY="sr-v12-weeks";
     var weeksEl=document.getElementById("weeks");
     var addWeekBtn=document.getElementById("addWeekBtn");
     var exportBtn=document.getElementById("exportBtn");
@@ -299,7 +326,7 @@
 
     /* ======= تصدير PDF بالعرض: الصفحة الأولى = صورة الديباجة + أول أسبوع ======= */
     exportBtn.addEventListener("click",function(){
-      var newTab = window.open("", "_blank");
+      var newTab = window.open("", "_blank"); // فتح تبويب جديد تزامني يعمل على الجوال
       if(!newTab){ alert("رجاءً فعّل النوافذ المنبثقة مؤقتًا للتصدير."); return; }
 
       var area = document.getElementById("exportArea");
@@ -353,7 +380,6 @@
         sandbox.remove();
 
         try{
-          // فتح تبويب جديد تم إنشاؤه تزامنيًا: يعمل على iOS/Android
           var blobUrl = pdf.output("bloburl");
           newTab.location.href = blobUrl;
           setTimeout(function(){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }, 60000);
@@ -368,4 +394,3 @@
   </script>
 </body>
 </html>
-
