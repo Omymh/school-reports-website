@@ -166,7 +166,7 @@
           <div><label>التاريخ</label><input id="f_date" type="date" style="width:100%;border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center"></div>
           <div><label>الصف</label><input id="f_grade" style="width:100%;border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center"></div>
           <div><label>الحصة</label><input id="f_period" style="width:100%;border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center"></div>
-          <div><label>المعلمة الغائبة</label><input id="f_absent" style="width:100%;border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center" placeholder="يُملأ تلقائيًا من خانة الأسبوع إن تُرك فارغًا"></div>
+          <div><label>المعلمة الغائبة</label><input id="f_absent" style="width:100%;border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center"></div>
           <div style="grid-column:1/-1"><label>ما تم تنفيذه</label><textarea id="f_exec" style="width:100%;border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;min-height:70px"></textarea></div>
           <div style="grid-column:1/-1">
             <label>المجال</label>
@@ -197,7 +197,7 @@
     attachFallback(document.getElementById('printBannerImg'));
 
     const DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    const LS_KEY="sr-v21-weeks";
+    const LS_KEY="sr-v21-weeks"; // الإبقاء على نفس المفتاح للحفاظ على البيانات
 
     const weeksEl=document.getElementById("weeks");
     document.getElementById("addWeekBtn").addEventListener("click",()=>{state.weeks.push(newWeek()); render();});
@@ -225,7 +225,6 @@
       return {
         id,
         teacherName:"",
-        absentTeacher:"",     // ✳️ خانة المعلمة الغائبة للأسبوع
         rows:DAYS.slice(1).map(d=>({day:d,date:"",grade:"",period:"",absent:"",executed:"",domain:{b:false,v:false,f:false}})),
         witnesses:[]
       };
@@ -242,7 +241,7 @@
     function renderWeekCard(wk,idx){
       const sec=document.createElement("section"); sec.className="card";
 
-      // Header (بدون زر + صف)
+      // Header (اسم الأسبوع + اسم المعلمة فقط)
       const h=document.createElement("div"); h.className="card-h no-print";
       const left=document.createElement("div"); left.className="row-2";
 
@@ -256,15 +255,6 @@
       inpTeacher.addEventListener("input",()=>{wk.teacherName=inpTeacher.value; save();});
       fTeacher.appendChild(inpTeacher); left.appendChild(fTeacher);
 
-      // ✳️ خانة المعلمة الغائبة للأسبوع
-      const fAbsentW=document.createElement("div"); fAbsentW.className="field";
-      fAbsentW.innerHTML='<label>المعلمة الغائبة:</label>';
-      const inpAbsentW=document.createElement("input");
-      inpAbsentW.placeholder="اسم المعلمة الغائبة";
-      inpAbsentW.value=wk.absentTeacher||"";
-      inpAbsentW.addEventListener("input",()=>{wk.absentTeacher=inpAbsentW.value; save();});
-      fAbsentW.appendChild(inpAbsentW); left.appendChild(fAbsentW);
-
       const right=document.createElement("div"); right.className="stack";
       if(state.weeks.length>1){
         const delW=document.createElement("button"); delW.className="btn btn-danger btn-xs"; delW.textContent="حذف الأسبوع";
@@ -276,12 +266,10 @@
       // Body
       const b=document.createElement("div"); b.className="card-b";
 
-      // معلومات تُطبع (تقرير فقط)
+      // معلومات تُطبع (تقرير فقط) — اسم المعلمة + رقم الأسبوع
       const meta=document.createElement("div");
       meta.className="print-meta print-only";
-      meta.innerHTML =
-        '<b>الأسبوع #'+(idx+1)+'</b> — اسم المعلمة: <b>'+(wk.teacherName?wk.teacherName:'—')+
-        '</b> — المعلمة الغائبة: <b>'+(wk.absentTeacher?wk.absentTeacher:'—')+'</b>';
+      meta.innerHTML = '<b>الأسبوع #'+(idx+1)+'</b> — اسم المعلمة: <b>'+(wk.teacherName?wk.teacherName:'—')+'</b>';
       b.appendChild(meta);
 
       // الجدول
@@ -358,12 +346,11 @@
       const wk=state.weeks.find(w=>w.id===weekId);
       const r=(idx==null)?{day:"",date:"",grade:"",period:"",absent:"",executed:"",domain:{b:false,v:false,f:false}}:wk.rows[idx];
 
-      // عبّي من إعدادات الأسبوع عند الحاجة
       f_day.value=r.day||"";
       f_date.value=r.date||"";
       f_grade.value=r.grade||"";
       f_period.value=r.period||"";
-      f_absent.value = (r.absent && r.absent.trim()) ? r.absent : (wk.absentTeacher||"");
+      f_absent.value=r.absent||"";  // لم نعد نملأ من خانة أسبوعية
       f_exec.value=r.executed||"";
       c_basics.checked=!!(r.domain&&r.domain.b);
       c_values.checked=!!(r.domain&&r.domain.v);
@@ -375,15 +362,12 @@
     saveRowBtn.onclick=function(){
       if(!editCtx) return;
       const wk=state.weeks.find(w=>w.id===editCtx.weekId);
-      let absentVal = f_absent.value.trim();
-      if(!absentVal && wk.absentTeacher) absentVal = wk.absentTeacher; // ✳️ املأ تلقائيًا لو فاضي
-
       const obj={
         day:f_day.value,
         date:f_date.value,
         grade:f_grade.value,
         period:f_period.value,
-        absent:absentVal,
+        absent:f_absent.value.trim(),
         executed:f_exec.value,
         domain:{b:c_basics.checked,v:c_values.checked,f:c_future.checked}
       };
