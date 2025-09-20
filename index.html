@@ -11,98 +11,66 @@
       --ink:#263b33; --ink-soft:#4b6a5d;
       --border:#e3ece6; --border-2:#d8e5dc;
       --paper:#fff; --page:#f6faf8;
-      --banner-bg:#e8f6ef; --banner-ink:#116e4f;
       --shadow:0 6px 22px rgba(0,0,0,.06);
-      --shadow-green:0 10px 30px rgba(40,167,69,.15);
       --shadow-soft:0 2px 10px rgba(0,0,0,.04);
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--page);color:var(--ink);
       font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.75}
 
-    /* حاوية عامة */
     .container{max-width:1180px;margin:20px auto;padding:0 16px}
 
-    /* ديباجة */
-    .banner{background:var(--banner-bg);color:var(--banner-ink);border:1px solid var(--border);
-      border-radius:20px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;
-      box-shadow:var(--shadow-green);margin-bottom:12px}
-    .title{font-weight:800;font-size:1.6rem;text-align:center;flex:1}
+    /* شريط تحكم بسيط بدل الديباجة */
+    .toolbar{background:#fff;border:1px solid var(--border-2);border-radius:14px;padding:12px 14px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:var(--shadow-soft);margin-bottom:12px}
+    .toolbar .title{font-weight:800}
 
-    /* أزرار */
     .btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 22px rgba(40,167,69,.20)}
+    .btn-primary{background:var(--primary);color:#fff}
     .btn-primary:hover{background:var(--primary-dark)}
-    .btn-ghost{background:#fff;border:1px solid var(--border);color:#204c3d}
+    .btn-ghost{background:#fff;border:1px solid var(--border-2);color:#204c3d}
     .btn-danger{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
     .btn-xs{padding:6px 10px;border-radius:10px;font-size:.9rem}
     .stack{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-    /* زر عائم للجوال */
-    .fab{position:fixed;right:14px;bottom:14px;z-index:60}
-    .fab .btn{border-radius:999px;padding:12px 18px;box-shadow:0 12px 26px rgba(40,167,69,.25)}
-
     /* بطاقات */
-    .card{background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+    .card{background:#fff;border:1px solid var(--border-2);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
     .card + .card{margin-top:16px}
-    .card-h{padding:14px 16px;border-bottom:1px solid var(--border);
+    .card-h{padding:12px 14px;border-bottom:1px solid var(--border-2);
       display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,#fbfdfc,#fff)}
-    .card-b{padding:16px}
+    .card-b{padding:14px}
 
     .teacher{display:flex;align-items:center;gap:10px}
     .teacher label{color:var(--ink-soft);font-weight:700;white-space:nowrap}
     .teacher input{min-width:260px;border:1px solid var(--border-2);border-radius:10px;padding:10px 14px;text-align:center;outline:0}
     .teacher input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(40,167,69,.10)}
 
-    /* جدول: شاشة */
-    .table-wrap{
-      border:1px solid var(--border);border-top:0;border-radius:0 0 16px 16px;overflow:auto;
-      box-shadow:var(--shadow-soft);position:relative
-    }
-    .table-wrap::after{
-      content:"↔ اسحب أفقياً"; position:absolute; top:8px; left:12px; font-size:.85rem; color:#89a093;
-    }
+    /* جدول (شاشة) */
+    .table-wrap{border:1px solid var(--border-2);border-top:0;border-radius:0 0 14px 14px;overflow:auto;position:relative}
+    .table-wrap::after{content:"↔ اسحب أفقياً"; position:absolute; top:8px; left:12px; font-size:.85rem; color:#98a9a2}
     table{border-collapse:separate;border-spacing:0;width:100%;background:var(--paper);table-layout:auto}
-    thead th{
-      position:sticky;top:0;z-index:2;background:linear-gradient(180deg,#e9f7ef,#f6fbf8);
-      color:#1d6a4f;font-weight:800;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap
-    }
-    th,td{
-      border-right:1px solid var(--border);border-bottom:1px solid var(--border);
-      padding:12px 10px;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-    }
+    thead th{position:sticky;top:0;z-index:2;background:#f3f7f5;color:#1f4738;font-weight:800;border-bottom:1px solid var(--border-2);text-align:center;white-space:nowrap}
+    th,td{border-right:1px solid var(--border-2);border-bottom:1px solid var(--border-2);padding:10px 8px;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     th:first-child,td:first-child{border-right:none}
     tbody tr:nth-child(even) td{background:#fbfdfc}
     tbody tr:hover td{background:#f4faf6}
-    .week-title{font-weight:800;color:#2b6f57}
+    .week-title{font-weight:800}
+
+    /* أعمدة */
+    th.col-idx{width:48px} th.col-day{width:110px} th.col-date{width:150px}
+    th.col-grade{width:120px} th.col-period{width:120px} th.col-absent{width:180px}
+    th.col-domain{width:210px} th.col-actions{width:170px}
     .tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;white-space:normal}
-    .tag{border:1px solid var(--border-2);background:#f7faf8;padding:4px 8px;border-radius:999px;font-size:.9rem;color:#2a5d4c}
-
-    /* عرض الأعمدة */
-    th.col-idx{width:48px}
-    th.col-day{width:110px}
-    th.col-date{width:150px}
-    th.col-grade{width:120px}
-    th.col-period{width:120px}
-    th.col-absent{width:180px}
-    th.col-domain{width:210px}
-    th.col-actions{width:170px}
-
-    /* تذييل */
-    .footer{margin-top:18px;background:var(--banner-bg);color:var(--banner-ink);border:1px solid var(--border);
-      border-radius:18px;padding:14px 16px;text-align:center;box-shadow:var(--shadow-green)}
+    .tag{border:1px solid var(--border-2);background:#f8faf9;padding:4px 8px;border-radius:999px;font-size:.9rem;color:#2a5d4c}
 
     /* طباعة/تصدير */
     .no-print{display:initial} .print-only{display:none}
     .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
     .pdf-slim *{box-shadow:none!important}
 
-    /* إخفاء عمود "الإجراءات" وقت التصدير/الطباعة فقط */
-    .exporting th.col-actions,
-    .exporting td.col-actions { display: none !important; }
-    @media print{
-      th.col-actions, td.col-actions { display: none !important; }
-    }
+    /* إخفاء عمود "الإجراءات" بالتقرير فقط (ونسخ الـSandbox نحذفها برمجيًا أيضًا) */
+    .exporting th.col-actions, .exporting td.col-actions { display:none!important; }
+    @media print{ th.col-actions, td.col-actions { display:none!important; } }
 
     @media print{
       @page{size:A4 landscape; margin:10mm}
@@ -113,28 +81,23 @@
       .table-wrap::after{content:none}
     }
 
-    /* جوال */
+    /* الجوال */
     @media (max-width:640px){
       .container{padding:0 12px}
-      .banner{flex-direction:column;align-items:center;text-align:center;gap:12px}
-      .banner .title{font-size:1.35rem}
-      .banner .stack{width:100%;justify-content:center}
-      .card-h{flex-direction:column;align-items:stretch;gap:10px}
-      .teacher{justify-content:center}
-      .teacher input{min-width:0;width:100%}
-      .table-wrap{border-radius:0 0 14px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .toolbar{flex-direction:column;gap:10px;align-items:stretch}
+      .table-wrap{border-radius:0 0 12px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
       table{min-width:980px}
       thead th{font-size:.92rem}
-      th,td{padding:10px 8px;font-size:.92rem}
+      th,td{padding:9px 8px;font-size:.92rem}
       td.col-actions .btn{padding:6px 10px}
-      .fab{display:block}
     }
 
-    /* Sandbox خفي للتصدير */
+    /* صندوق التصدير */
     #printSandbox{position:fixed;left:-99999px;top:0;width:1200px;background:#fff;pointer-events:none;opacity:0}
-    #printSandbox .sheet{margin:0 0 18px 0;border:1px solid #eee;border-radius:12px}
+    #printSandbox .sheet{margin:0 0 18px 0;border:1px solid #eee;border-radius:12px;padding:0}
     #printSandbox .sheet .card{border-radius:0;box-shadow:none;border:0}
     #printSandbox .sheet .card-h{border-bottom:1px solid #ddd}
+    #printBannerImg{max-width:100%;height:auto;display:block;margin:0 auto}
   </style>
 
   <!-- مكتبات التصدير -->
@@ -143,9 +106,9 @@
 </head>
 <body>
   <div class="container">
-    <!-- ديباجة -->
-    <div class="banner no-print">
-      <div class="title">الثانوية السادسة والعشرون - تبوك</div>
+    <!-- شريط التحكم (بدون ديباجة لونية) -->
+    <div class="toolbar no-print">
+      <div class="title">تقرير حصص الانتظار</div>
       <div class="stack">
         <button id="addWeekBtn" class="btn btn-primary">إضافة أسبوع</button>
         <button id="exportBtn" class="btn btn-primary">تصدير PDF</button>
@@ -153,30 +116,20 @@
     </div>
 
     <!-- منطقة التصدير -->
-    <div id="exportArea" style="margin-top:14px">
-      <div class="banner print-only" id="printBanner" style="box-shadow:var(--shadow-green)">
-        <div class="title">الثانوية السادسة والعشرون - تبوك</div>
+    <div id="exportArea">
+      <!-- ديباجة التقرير = صورة 26 (تظهر في التقرير فقط) -->
+      <div class="print-only" id="printBanner">
+        <img id="printBannerImg" src="26.png" alt="ديباجة التقرير" />
       </div>
       <div id="weeks"></div>
     </div>
-
-    <!-- تذييل -->
-    <div class="footer no-print">
-      <div>مديرة المدرسة: <strong>أماني آل عبشان</strong></div>
-      <div>تصميم الهيئة الإدارية: <strong>عيدة صلاح</strong>، <strong>منيرة العمراني</strong></div>
-    </div>
-  </div>
-
-  <!-- زر عائم للجوال لإضافة أسبوع -->
-  <div class="fab no-print">
-    <button id="addWeekFab" class="btn btn-primary">+ أسبوع</button>
   </div>
 
   <!-- نافذة إدخال صف -->
   <div id="rowModal" class="modal no-print" style="position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:16px;z-index:50">
-    <div class="modal-card" style="background:#fff;border-radius:18px;box-shadow:var(--shadow);max-width:760px;width:100%;overflow:hidden;border:1px solid var(--border)">
-      <div class="modal-h" style="padding:14px 16px;border-bottom:1px solid var(--border);font-weight:800;color:#2b6f57">إدخال بيانات الصف</div>
-      <div class="modal-b" style="padding:16px">
+    <div class="modal-card" style="background:#fff;border-radius:16px;box-shadow:var(--shadow);max-width:760px;width:100%;overflow:hidden;border:1px solid var(--border-2)">
+      <div class="modal-h" style="padding:12px 14px;border-bottom:1px solid var(--border-2);font-weight:800">إدخال بيانات الصف</div>
+      <div class="modal-b" style="padding:14px">
         <div class="grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
           <div class="field"><label>اليوم</label>
             <select id="f_day" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0">
@@ -192,14 +145,14 @@
           <div class="field" style="grid-column:1/-1">
             <label>المجال</label>
             <div class="checks" style="display:flex;gap:8px;flex-wrap:wrap">
-              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_basics"> المهارات الأساسية</label>
-              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_values"> القيم والمواطنة الصالحة</label>
-              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_future"> مهارات المستقبل</label>
+              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border-2);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_basics"> المهارات الأساسية</label>
+              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border-2);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_values"> القيم والمواطنة الصالحة</label>
+              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border-2);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_future"> مهارات المستقبل</label>
             </div>
           </div>
         </div>
       </div>
-      <div class="modal-f" style="display:flex;gap:10px;justify-content:flex-start;padding:14px 16px">
+      <div class="modal-f" style="display:flex;gap:10px;justify-content:flex-start;padding:12px 14px">
         <button id="saveRowBtn" class="btn btn-primary">حفظ</button>
         <button id="cancelRowBtn" class="btn btn-ghost">إلغاء</button>
       </div>
@@ -208,11 +161,17 @@
 
   <script>
   (function(){
+    // بدّل تلقائيًا إلى 26.jpg إذا 26.png غير موجودة
+    var bannerImg=document.getElementById('printBannerImg');
+    bannerImg.addEventListener('error', function(){
+      if(this.src.endsWith('26.png')) this.src='26.jpg';
+      else if(this.src.endsWith('26.jpg')) this.src='26.jpeg';
+    });
+
     var DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    var LS_KEY="sr-v10-weeks";
+    var LS_KEY="sr-v11-weeks";
     var weeksEl=document.getElementById("weeks");
     var addWeekBtn=document.getElementById("addWeekBtn");
-    var addWeekFab=document.getElementById("addWeekFab");
     var exportBtn=document.getElementById("exportBtn");
 
     var rowModal=document.getElementById("rowModal");
@@ -229,14 +188,10 @@
     var saveRowBtn=document.getElementById("saveRowBtn");
     var cancelRowBtn=document.getElementById("cancelRowBtn");
 
-    var state=load();
-    var editCtx=null;
+    var state=load(); var editCtx=null;
 
-    function load(){
-      try{var s=localStorage.getItem(LS_KEY);if(s) return JSON.parse(s);}catch(e){}
-      return {weeks:[newWeek()]};
-    }
-    function save(){localStorage.setItem(LS_KEY,JSON.stringify(state));}
+    function load(){ try{var s=localStorage.getItem(LS_KEY);if(s) return JSON.parse(s);}catch(e){} return {weeks:[newWeek()]}; }
+    function save(){ localStorage.setItem(LS_KEY,JSON.stringify(state)); }
     function newWeek(){
       var id="w-"+Date.now()+"-"+Math.random().toString(16).slice(2);
       return {id:id,teacherName:"",title:"الأسبوع",
@@ -245,7 +200,7 @@
 
     function render(){
       weeksEl.innerHTML="";
-      for(var w=0;w<state.weeks.length;w++){weeksEl.appendChild(renderWeekCard(state.weeks[w],w));}
+      state.weeks.forEach(function(wk,i){ weeksEl.appendChild(renderWeekCard(wk,i)); });
       save();
     }
 
@@ -281,29 +236,30 @@
         '<th class="col-actions">إجراءات</th>'+
       '</tr></thead><tbody></tbody>';
       var tbody=table.querySelector("tbody");
-      if(!wk.rows||!wk.rows.length){wk.rows=DAYS.slice(1).map(function(d){return {day:d,date:"",grade:"",period:"",absent:"",executed:"",witness:"",domain:{b:false,v:false,f:false}};});}
 
-      for(var i=0;i<wk.rows.length;i++){
-        (function(iCopy){
-          var r=wk.rows[iCopy];
-          var tr=document.createElement("tr");
-          tr.appendChild(tdText(iCopy+1));
-          tr.appendChild(tdText(r.day||""));
-          tr.appendChild(tdText(r.date||""));
-          tr.appendChild(tdText(r.grade||""));
-          tr.appendChild(tdText(r.period||""));
-          tr.appendChild(tdText(r.absent||""));
-          tr.appendChild(tdText(r.executed||""));
-          tr.appendChild(tdText(r.witness||""));
-          var domTd=document.createElement("td"); domTd.appendChild(renderTags(r.domain)); tr.appendChild(domTd);
-
-          var act=document.createElement("td"); act.className="col-actions";
-          var edit=document.createElement("button"); edit.className="btn btn-ghost btn-xs"; edit.textContent="إضافة"; edit.addEventListener("click",function(){openRowModal(wk.id,iCopy);});
-          var del=document.createElement("button"); del.className="btn btn-danger btn-xs"; del.textContent="حذف"; del.addEventListener("click",function(){wk.rows.splice(iCopy,1);render();});
-          var stack=document.createElement("div"); stack.className="stack"; stack.appendChild(edit); stack.appendChild(del); act.appendChild(stack); tr.appendChild(act);
-          tbody.appendChild(tr);
-        })(i);
+      if(!wk.rows||!wk.rows.length){
+        wk.rows=DAYS.slice(1).map(function(d){return {day:d,date:"",grade:"",period:"",absent:"",executed:"",witness:"",domain:{b:false,v:false,f:false}};});
       }
+
+      wk.rows.forEach(function(r,i){
+        var tr=document.createElement("tr");
+        tr.appendChild(tdText(i+1));
+        tr.appendChild(tdText(r.day||""));
+        tr.appendChild(tdText(r.date||""));
+        tr.appendChild(tdText(r.grade||""));
+        tr.appendChild(tdText(r.period||""));
+        tr.appendChild(tdText(r.absent||""));
+        tr.appendChild(tdText(r.executed||""));
+        tr.appendChild(tdText(r.witness||""));
+        var domTd=document.createElement("td"); domTd.appendChild(renderTags(r.domain)); tr.appendChild(domTd);
+
+        var act=document.createElement("td"); act.className="col-actions";
+        var edit=document.createElement("button"); edit.className="btn btn-ghost btn-xs"; edit.textContent="إضافة"; edit.addEventListener("click",function(){openRowModal(wk.id,i);});
+        var del=document.createElement("button"); del.className="btn btn-danger btn-xs"; del.textContent="حذف"; del.addEventListener("click",function(){wk.rows.splice(i,1);render();});
+        var stack=document.createElement("div"); stack.className="stack"; stack.appendChild(edit); stack.appendChild(del); act.appendChild(stack); tr.appendChild(act);
+        tbody.appendChild(tr);
+      });
+
       tableWrap.appendChild(table); b.appendChild(tableWrap); wrap.appendChild(b);
       return wrap;
     }
@@ -339,11 +295,9 @@
     });
     cancelRowBtn.addEventListener("click",closeRowModal);
 
-    function addWeek(){state.weeks.push(newWeek()); render();}
-    addWeekBtn.addEventListener("click",addWeek);
-    addWeekFab.addEventListener("click",addWeek);
+    addWeekBtn.addEventListener("click",function(){state.weeks.push(newWeek()); render();});
 
-    /* ======= تصدير PDF بالعرض: الصفحة الأولى = الديباجة + أول أسبوع ======= */
+    /* ======= تصدير PDF بالعرض: الصفحة الأولى = صورة الديباجة + أول أسبوع ======= */
     exportBtn.addEventListener("click",function(){
       var newTab = window.open("", "_blank");
       if(!newTab){ alert("رجاءً فعّل النوافذ المنبثقة مؤقتًا للتصدير."); return; }
@@ -358,16 +312,23 @@
 
       var cards = Array.prototype.slice.call(area.querySelectorAll(".card"));
 
+      // الصفحة الأولى: الديباجة (صورة) + أول أسبوع إن وجد
       var firstSheet = document.createElement("div"); firstSheet.className="sheet";
       firstSheet.appendChild(banner.cloneNode(true));
       if(cards[0]) firstSheet.appendChild(cards[0].cloneNode(true));
       sandbox.appendChild(firstSheet);
 
+      // باقي الصفحات: كل أسبوع لوحده
       for(var i=1;i<cards.length;i++){
         var s = document.createElement("div"); s.className="sheet";
         s.appendChild(cards[i].cloneNode(true));
         sandbox.appendChild(s);
       }
+
+      // احذف عمود "الإجراءات" من نسخة التصدير (DOM) قبل الالتقاط
+      sandbox.querySelectorAll('th.col-actions, td.col-actions').forEach(function(el){
+        if(el && el.parentNode) el.parentNode.removeChild(el);
+      });
 
       document.body.classList.add("exporting","pdf-slim");
 
@@ -387,10 +348,12 @@
           first=false;
           canvas.width=0; canvas.height=0;
         }
+
         document.body.classList.remove("exporting","pdf-slim");
         sandbox.remove();
 
         try{
+          // فتح تبويب جديد تم إنشاؤه تزامنيًا: يعمل على iOS/Android
           var blobUrl = pdf.output("bloburl");
           newTab.location.href = blobUrl;
           setTimeout(function(){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }, 60000);
@@ -405,3 +368,4 @@
   </script>
 </body>
 </html>
+
