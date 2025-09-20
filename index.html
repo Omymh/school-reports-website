@@ -65,6 +65,10 @@
     th.col-grade{width:120px} th.col-period{width:120px} th.col-absent{width:180px}
     th.col-domain{width:210px} th.col-actions{width:170px}
 
+    /* معلومات الطباعة (تظهر في التقرير فقط) */
+    .print-meta{display:none;margin:10px 0 6px;padding:8px 10px;border:1px dashed var(--border-2);border-radius:10px;text-align:center;color:#1f4738}
+    .print-meta b{color:#1f4738}
+
     /* الشواهد (أسفل الجدول) */
     .witness{padding:12px 0 4px}
     .witness h4{margin:0 0 8px;font-weight:800}
@@ -82,7 +86,8 @@
     .no-print{display:initial} .print-only{display:none}
     .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
     .exporting th.col-actions, .exporting td.col-actions { display:none!important; }
-    @media print{ th.col-actions, td.col-actions { display:none!important; } }
+    .exporting .print-meta{display:block!important;}
+    @media print{ th.col-actions, td.col-actions { display:none!important; } .print-meta{display:block!important;} }
 
     @media print{
       @page{size:A4 landscape; margin:10mm}
@@ -189,7 +194,7 @@
     attachFallback(document.getElementById('printBannerImg'));
 
     const DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    const LS_KEY="sr-v19-weeks";
+    const LS_KEY="sr-v20-weeks";
 
     const weeksEl=document.getElementById("weeks");
     document.getElementById("addWeekBtn").addEventListener("click",()=>{state.weeks.push(newWeek()); render();});
@@ -228,7 +233,7 @@
     function renderWeekCard(wk,idx){
       const sec=document.createElement("section"); sec.className="card";
 
-      // Header
+      // Header (شاشة فقط)
       const h=document.createElement("div"); h.className="card-h no-print";
       const left=document.createElement("div"); left.className="stack";
       const title=document.createElement("div"); title.textContent="الأسبوع #"+(idx+1); title.style.fontWeight="800";
@@ -237,13 +242,21 @@
       const inp=document.createElement("input"); inp.value=wk.teacherName||""; inp.addEventListener("input",()=>{wk.teacherName=inp.value; save();});
       teacherBox.appendChild(inp); left.appendChild(title); left.appendChild(teacherBox);
       const right=document.createElement("div"); right.className="stack";
-      const addRow=document.createElement("button"); addRow.className="btn btn-primary btn-xs"; addRow.textContent="+ صف"; addRow.onclick=()=>openRowModal(wk.id,i=null);
+      const addRow=document.createElement("button"); addRow.className="btn btn-primary btn-xs"; addRow.textContent="+ صف"; addRow.onclick=()=>openRowModal(wk.id,null);
       right.appendChild(addRow);
       if(state.weeks.length>1){ const delW=document.createElement("button"); delW.className="btn btn-danger btn-xs"; delW.textContent="حذف الأسبوع"; delW.onclick=()=>{state.weeks=state.weeks.filter(w=>w.id!==wk.id); render();}; right.appendChild(delW); }
       h.appendChild(left); h.appendChild(right); sec.appendChild(h);
 
-      // Body / table
+      // Body
       const b=document.createElement("div"); b.className="card-b";
+
+      // 🔽 معلومات تُطبع (تظهر في التصدير فقط)
+      const meta=document.createElement("div");
+      meta.className="print-meta print-only";
+      meta.innerHTML = '<b>الأسبوع #'+(idx+1)+'</b> — اسم المعلمة: <b>'+(wk.teacherName?wk.teacherName:'—')+'</b>';
+      b.appendChild(meta);
+
+      // الجدول
       const tWrap=document.createElement("div"); tWrap.className="table-wrap";
       const tbl=document.createElement("table");
       tbl.innerHTML='<thead><tr>'+
@@ -279,12 +292,10 @@
 
       tWrap.appendChild(tbl); b.appendChild(tWrap);
 
-      // Witness area
+      // الشواهد
       const wBox=document.createElement("div"); wBox.className="witness";
       const titleW=document.createElement("h4"); titleW.textContent="الشواهد"; wBox.appendChild(titleW);
       const grid=document.createElement("div"); grid.className="w-grid";
-
-      // أنشئ 3 خانات؛ الفارغة تأخذ class "empty" (سنخفيها من التقرير)
       for(let i=0;i<3;i++){
         const slot=document.createElement("div"); slot.className="slot";
         if(wk.witnesses[i]){ const img=document.createElement("img"); img.src=wk.witnesses[i]; slot.appendChild(img); }
@@ -387,9 +398,9 @@
       card.querySelectorAll('th.col-actions, td.col-actions').forEach(el=>el.remove());
       // احذف أدوات رفع الشواهد
       card.querySelectorAll('.w-actions').forEach(el=>el.remove());
-      // اخفِ الخانات الفارغة (مثلاً لو صورتين فقط لا نُظهر المربع الثالث)
+      // اخفِ الخانات الفارغة (لو صورتين فقط لا يظهر الثالث)
       card.querySelectorAll('.w-grid .slot.empty').forEach(el=>el.remove());
-      // إن لم تبق أي صورة، احذف قسم الشواهد بالكامل
+      // إن لم تبق أي صورة، احذف قسم الشواهد
       const w=card.querySelector('.witness');
       if(w && w.querySelectorAll('img').length===0){ w.remove(); }
       return card;
@@ -400,4 +411,3 @@
   </script>
 </body>
 </html>
-
