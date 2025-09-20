@@ -6,420 +6,135 @@
   <title>تقرير حصص الانتظار – الثانوية السادسة والعشرون (تبوك)</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --primary:#28a745; --primary-dark:#1e7e34;
-      --ink:#263b33; --ink-soft:#4b6a5d;
-      --border:#e3ece6; --border-2:#d8e5dc;
-      --paper:#fff; --page:#f6faf8;
-      --shadow:0 6px 22px rgba(0,0,0,.06);
-      --shadow-soft:0 2px 10px rgba(0,0,0,.04);
-      --r:16px;
+    body {
+      margin: 0;
+      font-family: "Tajawal", sans-serif;
+      background: #f6faf8;
+      color: #263b33;
+      line-height: 1.6;
+      overflow-x: hidden; /* إصلاح الحواف */
     }
-    *{box-sizing:border-box}
-    html,body{
-      margin:0;padding:0;background:var(--page);color:var(--ink);
-      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.75;
-      overflow-x:hidden; /* يمنع أي بروزات على الجوال */
+    .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+
+    /* ديباجة */
+    .banner img { max-width: 100%; border-radius: 10px; display: block; margin: auto; }
+
+    /* أزرار */
+    .toolbar { display: flex; justify-content: space-between; flex-wrap: wrap; margin: 15px 0; gap: 10px; }
+    .btn { padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; }
+    .btn-primary { background: #28a745; color: #fff; }
+
+    /* جدول */
+    .card { background: #fff; border-radius: 12px; padding: 15px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+    .card h3 { margin: 0 0 10px; font-weight: 800; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #d9e6de; padding: 8px; text-align: center; }
+    th { background: #f3f7f5; }
+
+    /* الشواهد */
+    .witness-section { margin-top: 15px; }
+    .witness-upload { display: flex; gap: 10px; flex-wrap: wrap; }
+    .witness-upload img { width: 100px; height: 100px; object-fit: cover; border: 1px solid #ccc; border-radius: 8px; }
+
+    /* للطباعة */
+    @media print {
+      .toolbar, .no-print { display: none !important; }
+      @page { size: A4 landscape; margin: 10mm; }
     }
-    .container{max-width:1180px;margin:20px auto;padding:0 16px;overflow:hidden}
-
-    /* الديباجة (الموقع) */
-    .site-banner{background:#fff;border:1px solid var(--border-2);border-radius:var(--r);padding:10px;box-shadow:var(--shadow-soft);margin-bottom:12px;overflow:hidden}
-    .site-banner .img-wrap{border:1px solid var(--border-2);border-radius:12px;padding:8px;overflow:hidden;background:#fff}
-    .site-banner img{display:block;max-width:100%;height:auto;margin:0 auto;border-radius:8px}
-
-    /* شريط التحكم */
-    .toolbar{background:#fff;border:1px solid var(--border-2);border-radius:var(--r);padding:12px 14px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:var(--shadow-soft);margin-bottom:12px;overflow:hidden}
-    .toolbar .title{font-weight:800}
-    .btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    .btn-primary{background:var(--primary);color:#fff}
-    .btn-primary:hover{background:var(--primary-dark)}
-    .btn-ghost{background:#fff;border:1px solid var(--border-2);color:#204c3d}
-    .btn-danger{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
-    .btn-xs{padding:6px 10px;border-radius:10px;font-size:.9rem}
-    .stack{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-
-    /* بطاقات */
-    .card{background:#fff;border:1px solid var(--border-2);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
-    .card + .card{margin-top:16px}
-    .card-h{padding:12px 14px;border-bottom:1px solid var(--border-2);
-      display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,#fbfdfc,#fff)}
-    .card-b{padding:14px}
-
-    .teacher{display:flex;align-items:center;gap:10px}
-    .teacher label{color:var(--ink-soft);font-weight:700;white-space:nowrap}
-    .teacher input{min-width:260px;border:1px solid var(--border-2);border-radius:10px;padding:10px 14px;text-align:center;outline:0}
-    .teacher input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(40,167,69,.10)}
-
-    /* جدول (شاشة) */
-    .table-wrap{border:1px solid var(--border-2);border-top:0;border-radius:0 0 var(--r) var(--r);overflow:auto;position:relative}
-    .table-wrap::after{content:"↔ اسحب أفقياً"; position:absolute; top:8px; left:12px; font-size:.85rem; color:#98a9a2}
-    table{border-collapse:separate;border-spacing:0;width:100%;background:var(--paper);table-layout:auto}
-    thead th{position:sticky;top:0;z-index:2;background:#f3f7f5;color:#1f4738;font-weight:800;border-bottom:1px solid var(--border-2);text-align:center;white-space:nowrap}
-    th,td{border-right:1px solid var(--border-2);border-bottom:1px solid var(--border-2);padding:10px 8px;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    th:first-child,td:first-child{border-right:none}
-    tbody tr:nth-child(even) td{background:#fbfdfc}
-    tbody tr:hover td{background:#f4faf6}
-    .week-title{font-weight:800}
-    th.col-idx{width:48px} th.col-day{width:110px} th.col-date{width:150px}
-    th.col-grade{width:120px} th.col-period{width:120px} th.col-absent{width:180px}
-    th.col-domain{width:210px} th.col-actions{width:170px}
-    .tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;white-space:normal}
-    .tag{border:1px solid var(--border-2);background:#f8faf9;padding:4px 8px;border-radius:999px;font-size:.9rem;color:#2a5d4c}
-
-    /* تذييل الموقع */
-    .footer{margin-top:14px;background:#e9f6ef;border:1px solid var(--border-2);border-radius:var(--r);padding:10px 12px;text-align:center;overflow:hidden}
-    .footer small{display:block;color:#215843}
-
-    /* طباعة/تصدير */
-    .no-print{display:initial} .print-only{display:none}
-    .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
-    .pdf-slim *{box-shadow:none!important}
-    .exporting th.col-actions, .exporting td.col-actions { display:none!important; }
-    @media print{ th.col-actions, td.col-actions { display:none!important; } }
-
-    @media print{
-      @page{size:A4 landscape; margin:10mm}
-      body{background:#fff!important}
-      .card{page-break-after:always}
-      thead th{background:#eaeaea!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      th,td{border:1px solid #000!important;white-space:normal}
-      .table-wrap::after{content:none}
-    }
-
-    /* الجوال */
-    @media (max-width:640px){
-      .container{padding:0 12px}
-      .toolbar{flex-direction:column;gap:10px;align-items:stretch}
-      .table-wrap{border-radius:0 0 12px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-      table{min-width:980px}
-      thead th{font-size:.92rem}
-      th,td{padding:9px 8px;font-size:.92rem}
-      td.col-actions .btn{padding:6px 10px}
-    }
-
-    /* صندوق التصدير */
-    #printSandbox{position:fixed;left:-99999px;top:0;width:1200px;background:#fff;pointer-events:none;opacity:0}
-    #printSandbox .sheet{margin:0 0 18px 0;border:1px solid #eee;border-radius:12px;padding:0;overflow:hidden}
-    #printSandbox .sheet .card{border-radius:0;box-shadow:none;border:0}
-    #printSandbox .sheet .card-h{border-bottom:1px solid #ddd}
-    #printBannerImg, #siteBannerImg{max-width:100%;height:auto;display:block;margin:0 auto}
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <!-- الديباجة في الموقع -->
-    <div class="site-banner">
-      <div class="img-wrap">
-        <img id="siteBannerImg" src="26.png" alt="ديباجة التقرير (الموقع)" />
-      </div>
+    <!-- ديباجة -->
+    <div class="banner">
+      <img src="26.png" alt="ديباجة التقرير">
     </div>
 
-    <!-- شريط التحكم -->
+    <!-- أزرار -->
     <div class="toolbar no-print">
-      <div class="title">تقرير حصص الانتظار</div>
-      <div class="stack">
-        <button id="addWeekBtn" class="btn btn-primary">إضافة أسبوع</button>
-        <button id="exportBtn" class="btn btn-primary">تصدير PDF</button>
-      </div>
+      <button id="addWeekBtn" class="btn btn-primary">إضافة أسبوع</button>
+      <button id="exportBtn" class="btn btn-primary">تصدير PDF</button>
     </div>
 
-    <!-- منطقة التصدير -->
-    <div id="exportArea">
-      <div class="print-only" id="printBanner">
-        <img id="printBannerImg" src="26.png" alt="ديباجة التقرير (التقرير)" />
-      </div>
-      <div id="weeks"></div>
-    </div>
+    <!-- تقارير -->
+    <div id="weeks"></div>
 
-    <!-- تذييل (الموقع فقط) -->
-    <div class="footer no-print">
-      <small>مديرة المدرسة: <strong>أماني آل عبشان</strong></small>
-      <small>تصميم الهيئة الإدارية: <strong>عيدة صلاح</strong>، <strong>منيرة العمراني</strong></small>
+    <!-- تذييل -->
+    <div class="footer no-print" style="margin-top:20px;text-align:center;color:#204c3d;">
+      <p>مديرة المدرسة: <strong>أماني آل عبشان</strong></p>
+      <p>تصميم الهيئة الإدارية: <strong>عيدة صلاح</strong>، <strong>منيرة العمراني</strong></p>
     </div>
   </div>
 
-  <!-- نافذة إدخال صف -->
-  <div id="rowModal" class="modal no-print" style="position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:16px;z-index:50">
-    <div class="modal-card" style="background:#fff;border-radius:16px;box-shadow:var(--shadow);max-width:760px;width:100%;overflow:hidden;border:1px solid var(--border-2)">
-      <div class="modal-h" style="padding:12px 14px;border-bottom:1px solid var(--border-2);font-weight:800">إدخال بيانات الصف</div>
-      <div class="modal-b" style="padding:14px">
-        <div class="grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
-          <div class="field"><label>اليوم</label>
-            <select id="f_day" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0">
-              <option value=""></option><option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option>
-            </select>
-          </div>
-          <div class="field"><label>التاريخ</label><input id="f_date" type="date" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0"></div>
-          <div class="field"><label>الصف</label><input id="f_grade" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0"></div>
-          <div class="field"><label>الحصة</label><input id="f_period" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0"></div>
-          <div class="field"><label>المعلمة الغائبة</label><input id="f_absent" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;text-align:center;outline:0"></div>
-          <div class="field" style="grid-column:1/-1"><label>ما تم تنفيذه</label><textarea id="f_exec" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;min-height:70px;text-align:right;outline:0"></textarea></div>
-          <div class="field" style="grid-column:1/-1"><label>الشاهد</label><textarea id="f_witness" style="border:1px solid var(--border-2);border-radius:10px;padding:10px 12px;min-height:70px;text-align:right;outline:0"></textarea></div>
-          <div class="field" style="grid-column:1/-1">
-            <label>المجال</label>
-            <div class="checks" style="display:flex;gap:8px;flex-wrap:wrap">
-              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border-2);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_basics"> المهارات الأساسية</label>
-              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border-2);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_values"> القيم والمواطنة الصالحة</label>
-              <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border-2);border-radius:10px;padding:8px 10px;background:#f7faf8"><input type="checkbox" id="c_future"> مهارات المستقبل</label>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-f" style="display:flex;gap:10px;justify-content:flex-start;padding:12px 14px">
-        <button id="saveRowBtn" class="btn btn-primary">حفظ</button>
-        <button id="cancelRowBtn" class="btn btn-ghost">إلغاء</button>
-      </div>
-    </div>
-  </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script>
-  (function(){
-    // Fallback لصورة الديباجة
-    function attachFallback(imgEl){
-      imgEl.addEventListener('error', function(){
-        if(this.src.endsWith('26.png')) this.src='26.jpg';
-        else if(this.src.endsWith('26.jpg')) this.src='26.jpeg';
+    const weeksEl = document.getElementById("weeks");
+    document.getElementById("addWeekBtn").addEventListener("click", addWeek);
+    document.getElementById("exportBtn").addEventListener("click", exportPDF);
+
+    function addWeek(){
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <h3>أسبوع جديد</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>اليوم</th><th>التاريخ</th><th>الصف</th><th>الحصة</th><th>المعلمة الغائبة</th><th>ما تم تنفيذه</th><th>المجال</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>الأحد</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>2</td><td>الاثنين</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>3</td><td>الثلاثاء</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>4</td><td>الأربعاء</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>5</td><td>الخميس</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+
+        <!-- قسم الشواهد -->
+        <div class="witness-section">
+          <h4>الشواهد (حتى 3 صور)</h4>
+          <input type="file" accept="image/*" multiple onchange="previewWitness(this, this.nextElementSibling)" />
+          <div class="witness-upload"></div>
+        </div>
+      `;
+      weeksEl.appendChild(card);
+    }
+
+    function previewWitness(input, container){
+      container.innerHTML = "";
+      const files = Array.from(input.files).slice(0,3); // فقط 3 صور
+      files.forEach(file=>{
+        const reader = new FileReader();
+        reader.onload = e=>{
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          container.appendChild(img);
+        };
+        reader.readAsDataURL(file);
       });
     }
-    attachFallback(document.getElementById('siteBannerImg'));
-    attachFallback(document.getElementById('printBannerImg'));
 
-    var DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    var LS_KEY="sr-v16-weeks";
-    var weeksEl=document.getElementById("weeks");
-    var addWeekBtn=document.getElementById("addWeekBtn");
-    var exportBtn=document.getElementById("exportBtn");
+    async function exportPDF(){
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF("l","mm","a4");
+      const cards = document.querySelectorAll(".card");
+      let first = true;
 
-    var rowModal=document.getElementById("rowModal");
-    var f_day=document.getElementById("f_day");
-    var f_date=document.getElementById("f_date");
-    var f_grade=document.getElementById("f_grade");
-    var f_period=document.getElementById("f_period");
-    var f_absent=document.getElementById("f_absent");
-    var f_exec=document.getElementById("f_exec");
-    var f_witness=document.getElementById("f_witness");
-    var c_basics=document.getElementById("c_basics");
-    var c_values=document.getElementById("c_values");
-    var c_future=document.getElementById("c_future");
-    var saveRowBtn=document.getElementById("saveRowBtn");
-    var cancelRowBtn=document.getElementById("cancelRowBtn");
-
-    var state=load(); var editCtx=null;
-
-    function load(){ try{var s=localStorage.getItem(LS_KEY);if(s) return JSON.parse(s);}catch(e){} return {weeks:[newWeek()]}; }
-    function save(){ localStorage.setItem(LS_KEY,JSON.stringify(state)); }
-    function newWeek(){
-      var id="w-"+Date.now()+"-"+Math.random().toString(16).slice(2);
-      return {id:id,teacherName:"",title:"الأسبوع",
-        rows:DAYS.slice(1).map(function(d){return {day:d,date:"",grade:"",period:"",absent:"",executed:"",witness:"",domain:{b:false,v:false,f:false}};})};
-    }
-
-    function render(){
-      weeksEl.innerHTML="";
-      state.weeks.forEach(function(wk,i){ weeksEl.appendChild(renderWeekCard(wk,i)); });
-      save();
-    }
-
-    function renderWeekCard(wk,wIdx){
-      var wrap=document.createElement("section"); wrap.className="card"; wrap.style.marginTop="16px";
-      var h=document.createElement("div"); h.className="card-h no-print";
-      var left=document.createElement("div"); left.className="stack";
-      var title=document.createElement("div"); title.className="week-title"; title.textContent=wk.title+" #"+(wIdx+1); left.appendChild(title);
-      var teacherBox=document.createElement("div"); teacherBox.className="teacher";
-      var label=document.createElement("label"); label.textContent="اسم المعلمة:"; var input=document.createElement("input");
-      input.value=wk.teacherName||""; input.addEventListener("input",function(){wk.teacherName=input.value;save();});
-      teacherBox.appendChild(label); teacherBox.appendChild(input); left.appendChild(teacherBox);
-      var right=document.createElement("div"); right.className="stack";
-      var addRowBtn=document.createElement("button"); addRowBtn.className="btn btn-primary btn-xs"; addRowBtn.textContent="+ صف";
-      addRowBtn.addEventListener("click",function(){openRowModal(wk.id,null);}); right.appendChild(addRowBtn);
-      if(state.weeks.length>1){var delWeek=document.createElement("button"); delWeek.className="btn btn-danger btn-xs"; delWeek.textContent="حذف الأسبوع";
-        delWeek.addEventListener("click",function(){state.weeks=state.weeks.filter(function(x){return x.id!==wk.id});render();}); right.appendChild(delWeek);}
-      h.appendChild(left); h.appendChild(right); wrap.appendChild(h);
-
-      var b=document.createElement("div"); b.className="card-b";
-      var tableWrap=document.createElement("div"); tableWrap.className="table-wrap";
-      var table=document.createElement("table");
-      table.innerHTML='<thead><tr>'+
-        '<th class="col-idx">#</th>'+
-        '<th class="col-day">اليوم</th>'+
-        '<th class="col-date">التاريخ</th>'+
-        '<th class="col-grade">الصف</th>'+
-        '<th class="col-period">الحصة</th>'+
-        '<th class="col-absent">المعلمة الغائبة</th>'+
-        '<th>ما تم تنفيذه</th>'+
-        '<th>الشاهد</th>'+
-        '<th class="col-domain">المجال</th>'+
-        '<th class="col-actions">إجراءات</th>'+
-      '</tr></thead><tbody></tbody>';
-      var tbody=table.querySelector("tbody");
-
-      if(!wk.rows||!wk.rows.length){
-        wk.rows=DAYS.slice(1).map(function(d){return {day:d,date:"",grade:"",period:"",absent:"",executed:"",witness:"",domain:{b:false,v:false,f:false}};});
+      for(let card of cards){
+        const canvas = await html2canvas(card,{scale:1.2});
+        const img = canvas.toDataURL("image/png");
+        const imgProps = pdf.getImageProperties(img);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        if(!first) pdf.addPage();
+        pdf.addImage(img,"PNG",0,0,pdfWidth,pdfHeight);
+        first = false;
       }
-
-      wk.rows.forEach(function(r,i){
-        var tr=document.createElement("tr");
-        tr.appendChild(tdText(i+1));
-        tr.appendChild(tdText(r.day||""));
-        tr.appendChild(tdText(r.date||""));
-        tr.appendChild(tdText(r.grade||""));
-        tr.appendChild(tdText(r.period||""));
-        tr.appendChild(tdText(r.absent||""));
-        tr.appendChild(tdText(r.executed||""));
-        tr.appendChild(tdText(r.witness||""));
-        var domTd=document.createElement("td"); domTd.appendChild(renderTags(r.domain)); tr.appendChild(domTd);
-
-        var act=document.createElement("td"); act.className="col-actions";
-        var edit=document.createElement("button"); edit.className="btn btn-ghost btn-xs"; edit.textContent="إضافة"; edit.addEventListener("click",function(){openRowModal(wk.id,i);});
-        var del=document.createElement("button"); del.className="btn btn-danger btn-xs"; del.textContent="حذف"; del.addEventListener("click",function(){wk.rows.splice(i,1);render();});
-        var stack=document.createElement("div"); stack.className="stack"; stack.appendChild(edit); stack.appendChild(del); act.appendChild(stack); tr.appendChild(act);
-        tbody.appendChild(tr);
-      });
-
-      tableWrap.appendChild(table); b.appendChild(tableWrap); wrap.appendChild(b);
-      return wrap;
+      pdf.save("تقرير-حصص-الانتظار.pdf");
     }
-
-    function tdText(t){var td=document.createElement("td"); td.textContent=t; return td;}
-    function renderTags(domain){
-      var wrap=document.createElement("div"); wrap.className="tags";
-      var arr=[];
-      if(domain&&domain.b) arr.push("المهارات الأساسية");
-      if(domain&&domain.v) arr.push("القيم والمواطنة الصالحة");
-      if(domain&&domain.f) arr.push("مهارات المستقبل");
-      if(!arr.length){wrap.textContent="—";return wrap;}
-      arr.forEach(function(x){var s=document.createElement("span"); s.className="tag"; s.textContent=x; wrap.appendChild(s);});
-      return wrap;
-    }
-
-    function openRowModal(weekId,idx){
-      editCtx={weekId:weekId,idx:idx};
-      var wk=state.weeks.find(function(w){return w.id===weekId});
-      var r=(idx==null)?{day:"",date:"",grade:"",period:"",absent:"",executed:"",witness:"",domain:{b:false,v:false,f:false}}:wk.rows[idx];
-      f_day.value=r.day||""; f_date.value=r.date||""; f_grade.value=r.grade||""; f_period.value=r.period||"";
-      f_absent.value=r.absent||""; f_exec.value=r.executed||""; f_witness.value=r.witness||"";
-      c_basics.checked=!!(r.domain&&r.domain.b); c_values.checked=!!(r.domain&&r.domain.v); c_future.checked=!!(r.domain&&r.domain.f);
-      rowModal.style.display="flex";
-    }
-    function closeRowModal(){rowModal.style.display="none"; editCtx=null;}
-    saveRowBtn.addEventListener("click",function(){
-      if(!editCtx) return;
-      var wk=state.weeks.find(function(w){return w.id===editCtx.weekId});
-      var obj={day:f_day.value,date:f_date.value,grade:f_grade.value,period:f_period.value,absent:f_absent.value,executed:f_exec.value,witness:f_witness.value,domain:{b:c_basics.checked,v:c_values.checked,f:c_future.checked}};
-      if(editCtx.idx==null) wk.rows.push(obj); else wk.rows[editCtx.idx]=obj;
-      save(); render(); closeRowModal();
-    });
-    cancelRowBtn.addEventListener("click",closeRowModal);
-
-    addWeekBtn.addEventListener("click",function(){state.weeks.push(newWeek()); render();});
-
-    /* ======= تصدير PDF وفتح صفحة تقرير (تنزيل/مشاركة) ======= */
-    exportBtn.addEventListener("click",function(){
-      const newTab = window.open("", "_blank"); // تبويب متزامن (مهم للجوال)
-      if(!newTab){ alert("رجاءً فعّل النوافذ المنبثقة مؤقتًا للتصدير."); return; }
-
-      const area = document.getElementById("exportArea");
-      const banner = document.getElementById("printBanner");
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth<700;
-
-      const sandbox = document.createElement("div");
-      sandbox.id = "printSandbox";
-      document.body.appendChild(sandbox);
-
-      const cards = Array.prototype.slice.call(area.querySelectorAll(".card"));
-
-      // الصفحة الأولى: الديباجة + أول أسبوع
-      const firstSheet = document.createElement("div"); firstSheet.className="sheet";
-      firstSheet.appendChild(banner.cloneNode(true));
-      if(cards[0]) firstSheet.appendChild(cards[0].cloneNode(true));
-      sandbox.appendChild(firstSheet);
-
-      // بقية الأسابيع
-      for(let i=1;i<cards.length;i++){
-        const s = document.createElement("div"); s.className="sheet";
-        s.appendChild(cards[i].cloneNode(true));
-        sandbox.appendChild(s);
-      }
-
-      // احذف عمود "الإجراءات" من نسخة التصدير
-      sandbox.querySelectorAll('th.col-actions, td.col-actions').forEach(function(el){
-        if(el && el.parentNode) el.parentNode.removeChild(el);
-      });
-
-      document.body.classList.add("exporting","pdf-slim");
-
-      const pdf = new window.jspdf.jsPDF("l","mm","a4");
-      const pageW=297;
-      const scale = isMobile ? 1.1 : 1.5;
-
-      (async function(){
-        let first=true;
-        for(let i=0;i<sandbox.children.length;i++){
-          const page = sandbox.children[i];
-          const canvas = await html2canvas(page,{scale:scale,backgroundColor:"#ffffff",useCORS:true,windowWidth:1200});
-          const img = canvas.toDataURL("image/jpeg",0.92);
-          const imgW=pageW, imgH=(canvas.height*imgW)/canvas.width;
-          if(!first) pdf.addPage();
-          pdf.addImage(img,"JPEG",0,0,imgW,imgH,undefined,"FAST");
-          first=false;
-        }
-
-        document.body.classList.remove("exporting","pdf-slim");
-        sandbox.remove();
-
-        try{
-          const blob = pdf.output("blob");
-          const blobUrl = URL.createObjectURL(blob);
-
-          // أنشئ صفحة العارض DOM بالكامل (بدون document.write لنص سكربت)
-          const d = newTab.document;
-          d.open();
-          d.write('<!doctype html><html lang="ar" dir="rtl"><head>'+
-                  '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+
-                  '<title>تقرير حصص الانتظار (PDF)</title>'+
-                  '<style>body{margin:0;background:#f6faf8;font-family:Tajawal,system-ui;-webkit-font-smoothing:antialiased}'+
-                  '.bar{position:sticky;top:0;background:#fff;border-bottom:1px solid #e3ece6;padding:10px;display:flex;gap:10px;justify-content:center;z-index:10}'+
-                  '.btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}'+
-                  '.btn-primary{background:#28a745;color:#fff}.btn-ghost{background:#fff;border:1px solid #e3ece6;color:#204c3d}'+
-                  '.frame{width:100%;height:calc(100dvh - 62px);border:0;display:block;background:#fff}</style>'+
-                  '</head><body></body></html>');
-          d.close();
-
-          const bar=d.createElement('div'); bar.className='bar';
-          const dl=d.createElement('button'); dl.id='dl'; dl.className='btn btn-primary'; dl.textContent='تنزيل PDF';
-          const sh=d.createElement('button'); sh.id='sh'; sh.className='btn btn-ghost'; sh.textContent='مشاركة';
-          bar.appendChild(dl); bar.appendChild(sh);
-          const frame=d.createElement('iframe'); frame.className='frame'; frame.id='pdf'; frame.src=blobUrl;
-          d.body.appendChild(bar); d.body.appendChild(frame);
-
-          // أضف السكربت داخل تبويب العارض نفسه
-          const s=d.createElement('script');
-          s.type='text/javascript';
-          s.textContent =
-            '(function(){'+
-            'var url="'+blobUrl+'";'+
-            'document.getElementById("dl").addEventListener("click",function(){var a=document.createElement("a");a.href=url;a.download="تقرير-حصص-الانتظار.pdf";document.body.appendChild(a);a.click();a.remove();});'+
-            'document.getElementById("sh").addEventListener("click",async function(){try{'+
-              'if(navigator.canShare){try{var resp=await fetch(url);var b=await resp.blob();var file=new File([b],"تقرير-حصص-الانتظار.pdf",{type:"application/pdf"});if(navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"تقرير حصص الانتظار"});return;}}catch(e){} }'+
-              'if(navigator.share){await navigator.share({title:"تقرير حصص الانتظار",url:url});}else{location.href=url;}'+
-            '}catch(e){}});'+
-            '})();';
-          d.body.appendChild(s);
-
-          // حرر الذاكرة بعد 5 دقائق
-          setTimeout(function(){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }, 5*60*1000);
-        }catch(e){
-          pdf.save("تقرير-حصص-الانتظار.pdf");
-        }
-      })();
-    });
-
-    render();
-  })();
   </script>
 </body>
 </html>
