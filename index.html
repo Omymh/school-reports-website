@@ -19,11 +19,11 @@
     html,body{
       margin:0;padding:0;background:var(--page);color:var(--ink);
       font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.75;
-      overflow-x:hidden; /* يمنع بروزات على الجوال */
+      overflow-x:hidden; /* يمنع أي بروزات على الجوال */
     }
     .container{max-width:1180px;margin:20px auto;padding:0 16px;overflow:hidden}
 
-    /* الديباجة (مرئية بالموقع) */
+    /* الديباجة (الموقع) */
     .site-banner{background:#fff;border:1px solid var(--border-2);border-radius:var(--r);padding:10px;box-shadow:var(--shadow-soft);margin-bottom:12px;overflow:hidden}
     .site-banner .img-wrap{border:1px solid var(--border-2);border-radius:12px;padding:8px;overflow:hidden;background:#fff}
     .site-banner img{display:block;max-width:100%;height:auto;margin:0 auto;border-radius:8px}
@@ -62,15 +62,13 @@
     tbody tr:nth-child(even) td{background:#fbfdfc}
     tbody tr:hover td{background:#f4faf6}
     .week-title{font-weight:800}
-
-    /* أعمدة */
     th.col-idx{width:48px} th.col-day{width:110px} th.col-date{width:150px}
     th.col-grade{width:120px} th.col-period{width:120px} th.col-absent{width:180px}
     th.col-domain{width:210px} th.col-actions{width:170px}
     .tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;white-space:normal}
     .tag{border:1px solid var(--border-2);background:#f8faf9;padding:4px 8px;border-radius:999px;font-size:.9rem;color:#2a5d4c}
 
-    /* تذييل الموقع فقط */
+    /* تذييل الموقع */
     .footer{margin-top:14px;background:#e9f6ef;border:1px solid var(--border-2);border-radius:var(--r);padding:10px 12px;text-align:center;overflow:hidden}
     .footer small{display:block;color:#215843}
 
@@ -78,8 +76,6 @@
     .no-print{display:initial} .print-only{display:none}
     .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
     .pdf-slim *{box-shadow:none!important}
-
-    /* إخفاء عمود "الإجراءات" في التقرير فقط (ونحذفه فعليًا من نسخة التصدير) */
     .exporting th.col-actions, .exporting td.col-actions { display:none!important; }
     @media print{ th.col-actions, td.col-actions { display:none!important; } }
 
@@ -110,14 +106,11 @@
     #printSandbox .sheet .card-h{border-bottom:1px solid #ddd}
     #printBannerImg, #siteBannerImg{max-width:100%;height:auto;display:block;margin:0 auto}
   </style>
-
-  <!-- مكتبات التصدير -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="container">
-
     <!-- الديباجة في الموقع -->
     <div class="site-banner">
       <div class="img-wrap">
@@ -136,14 +129,13 @@
 
     <!-- منطقة التصدير -->
     <div id="exportArea">
-      <!-- ديباجة التقرير (تظهر داخل PDF) -->
       <div class="print-only" id="printBanner">
         <img id="printBannerImg" src="26.png" alt="ديباجة التقرير (التقرير)" />
       </div>
       <div id="weeks"></div>
     </div>
 
-    <!-- تذييل يظهر في الموقع فقط -->
+    <!-- تذييل (الموقع فقط) -->
     <div class="footer no-print">
       <small>مديرة المدرسة: <strong>أماني آل عبشان</strong></small>
       <small>تصميم الهيئة الإدارية: <strong>عيدة صلاح</strong>، <strong>منيرة العمراني</strong></small>
@@ -186,7 +178,7 @@
 
   <script>
   (function(){
-    // fallback لصورة الديباجة
+    // Fallback لصورة الديباجة
     function attachFallback(imgEl){
       imgEl.addEventListener('error', function(){
         if(this.src.endsWith('26.png')) this.src='26.jpg';
@@ -197,7 +189,7 @@
     attachFallback(document.getElementById('printBannerImg'));
 
     var DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    var LS_KEY="sr-v15-weeks";
+    var LS_KEY="sr-v16-weeks";
     var weeksEl=document.getElementById("weeks");
     var addWeekBtn=document.getElementById("addWeekBtn");
     var exportBtn=document.getElementById("exportBtn");
@@ -325,7 +317,7 @@
 
     addWeekBtn.addEventListener("click",function(){state.weeks.push(newWeek()); render();});
 
-    /* ======= تصدير PDF وفتح صفحة تقرير بها تنزيل/مشاركة ======= */
+    /* ======= تصدير PDF وفتح صفحة تقرير (تنزيل/مشاركة) ======= */
     exportBtn.addEventListener("click",function(){
       const newTab = window.open("", "_blank"); // تبويب متزامن (مهم للجوال)
       if(!newTab){ alert("رجاءً فعّل النوافذ المنبثقة مؤقتًا للتصدير."); return; }
@@ -383,30 +375,42 @@
           const blob = pdf.output("blob");
           const blobUrl = URL.createObjectURL(blob);
 
-          // صفحة عرض التقرير (بدون كتابة </script> حرفيًا)
-          const viewerHead = '<!doctype html><html lang="ar" dir="rtl"><head>'+
-          '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+
-          '<title>تقرير حصص الانتظار (PDF)</title>'+
-          '<style>body{margin:0;background:#f6faf8;font-family:Tajawal,system-ui;-webkit-font-smoothing:antialiased}'+
-          '.bar{position:sticky;top:0;background:#fff;border-bottom:1px solid #e3ece6;padding:10px;display:flex;gap:10px;justify-content:center;z-index:10}'+
-          '.btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}'+
-          '.btn-primary{background:#28a745;color:#fff} .btn-ghost{background:#fff;border:1px solid #e3ece6;color:#204c3d}'+
-          '.frame{width:100%;height:calc(100dvh - 62px);border:0;display:block;background:#fff}</style></head><body>';
-          const viewerBody = '<div class="bar">'+
-            '<button id="dl" class="btn btn-primary">تنزيل PDF</button>'+
-            '<button id="sh" class="btn btn-ghost">مشاركة</button>'+
-          '</div>'+
-          '<iframe class="frame" id="pdf" src="'+blobUrl+'"></iframe>';
-          const viewerScriptOpen = '<'+'script>';
-          const viewerScript = 'const url="'+blobUrl+'";'+
-            'document.getElementById("dl").addEventListener("click",()=>{const a=document.createElement("a");a.href=url;a.download="تقرير-حصص-الانتظار.pdf";document.body.appendChild(a);a.click();a.remove();});'+
-            'document.getElementById("sh").addEventListener("click",async ()=>{try{ if(navigator.canShare){ try{const resp=await fetch(url); const b=await resp.blob(); const file=new File([b],"تقرير-حصص-الانتظار.pdf",{type:"application/pdf"}); if(navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:"تقرير حصص الانتظار"}); return; }}catch(e){} } if(navigator.share){ await navigator.share({title:"تقرير حصص الانتظار", url:url}); } else { location.href=url; } }catch(e){} });';
-          const viewerScriptClose = '<'+'/script></body></html>';
+          // أنشئ صفحة العارض DOM بالكامل (بدون document.write لنص سكربت)
+          const d = newTab.document;
+          d.open();
+          d.write('<!doctype html><html lang="ar" dir="rtl"><head>'+
+                  '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+
+                  '<title>تقرير حصص الانتظار (PDF)</title>'+
+                  '<style>body{margin:0;background:#f6faf8;font-family:Tajawal,system-ui;-webkit-font-smoothing:antialiased}'+
+                  '.bar{position:sticky;top:0;background:#fff;border-bottom:1px solid #e3ece6;padding:10px;display:flex;gap:10px;justify-content:center;z-index:10}'+
+                  '.btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}'+
+                  '.btn-primary{background:#28a745;color:#fff}.btn-ghost{background:#fff;border:1px solid #e3ece6;color:#204c3d}'+
+                  '.frame{width:100%;height:calc(100dvh - 62px);border:0;display:block;background:#fff}</style>'+
+                  '</head><body></body></html>');
+          d.close();
 
-          newTab.document.open();
-          newTab.document.write(viewerHead + viewerBody + viewerScriptOpen + viewerScript + viewerScriptClose);
-          newTab.document.close();
+          const bar=d.createElement('div'); bar.className='bar';
+          const dl=d.createElement('button'); dl.id='dl'; dl.className='btn btn-primary'; dl.textContent='تنزيل PDF';
+          const sh=d.createElement('button'); sh.id='sh'; sh.className='btn btn-ghost'; sh.textContent='مشاركة';
+          bar.appendChild(dl); bar.appendChild(sh);
+          const frame=d.createElement('iframe'); frame.className='frame'; frame.id='pdf'; frame.src=blobUrl;
+          d.body.appendChild(bar); d.body.appendChild(frame);
 
+          // أضف السكربت داخل تبويب العارض نفسه
+          const s=d.createElement('script');
+          s.type='text/javascript';
+          s.textContent =
+            '(function(){'+
+            'var url="'+blobUrl+'";'+
+            'document.getElementById("dl").addEventListener("click",function(){var a=document.createElement("a");a.href=url;a.download="تقرير-حصص-الانتظار.pdf";document.body.appendChild(a);a.click();a.remove();});'+
+            'document.getElementById("sh").addEventListener("click",async function(){try{'+
+              'if(navigator.canShare){try{var resp=await fetch(url);var b=await resp.blob();var file=new File([b],"تقرير-حصص-الانتظار.pdf",{type:"application/pdf"});if(navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"تقرير حصص الانتظار"});return;}}catch(e){} }'+
+              'if(navigator.share){await navigator.share({title:"تقرير حصص الانتظار",url:url});}else{location.href=url;}'+
+            '}catch(e){}});'+
+            '})();';
+          d.body.appendChild(s);
+
+          // حرر الذاكرة بعد 5 دقائق
           setTimeout(function(){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }, 5*60*1000);
         }catch(e){
           pdf.save("تقرير-حصص-الانتظار.pdf");
