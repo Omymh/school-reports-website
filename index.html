@@ -16,22 +16,27 @@
       --banner-ring:#e3efe9;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--page);color:var(--ink);
-      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.75}
+    html,body{
+      margin:0;padding:0;background:var(--page);color:var(--ink);
+      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.75;
+      /* يمنع انزياحات وتشوه الحواف على الجوال */
+      overflow-x:hidden;
+    }
 
-    .container{max-width:1180px;margin:20px auto;padding:0 16px}
+    .container{max-width:1180px;margin:20px auto;padding:0 16px;overflow:hidden}
 
     /* ديباجة مرئية في الموقع */
-    .site-banner{background:#fff;border:1px solid var(--border-2);border-radius:16px;padding:10px;box-shadow:var(--shadow-soft);margin-bottom:12px}
-    .site-banner .img-wrap{background:linear-gradient(180deg,#f7fbf9,#fff);border:1px solid var(--banner-ring);border-radius:12px;padding:8px}
+    .site-banner{background:#fff;border:1px solid var(--border-2);border-radius:16px;padding:10px;box-shadow:var(--shadow-soft);margin-bottom:12px;overflow:hidden}
+    .site-banner .img-wrap{background:linear-gradient(180deg,#f7fbf9,#fff);border:1px solid var(--banner-ring);border-radius:12px;padding:8px;overflow:hidden}
     .site-banner img{display:block;max-width:100%;height:auto;margin:0 auto;border-radius:8px}
 
     /* شريط التحكم */
     .toolbar{background:#fff;border:1px solid var(--border-2);border-radius:14px;padding:12px 14px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:var(--shadow-soft);margin-bottom:12px}
+      display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:var(--shadow-soft);margin-bottom:12px;overflow:hidden}
     .toolbar .title{font-weight:800}
 
     .btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
     .btn-primary{background:var(--primary);color:#fff}
     .btn-primary:hover{background:var(--primary-dark)}
     .btn-ghost{background:#fff;border:1px solid var(--border-2);color:#204c3d}
@@ -70,7 +75,7 @@
     .tag{border:1px solid var(--border-2);background:#f8faf9;padding:4px 8px;border-radius:999px;font-size:.9rem;color:#2a5d4c}
 
     /* تذييل الموقع (يظهر في الموقع فقط) */
-    .footer{margin-top:14px;background:#e9f6ef;border:1px solid var(--border-2);border-radius:14px;padding:10px 12px;text-align:center}
+    .footer{margin-top:14px;background:#e9f6ef;border:1px solid var(--border-2);border-radius:14px;padding:10px 12px;text-align:center;overflow:hidden}
     .footer small{display:block;color:#215843}
 
     /* طباعة/تصدير */
@@ -78,7 +83,7 @@
     .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
     .pdf-slim *{box-shadow:none!important}
 
-    /* إخفاء عمود "الإجراءات" بالتقرير فقط (وسنحذفه من الـSandbox أيضًا) */
+    /* إخفاء عمود "الإجراءات" في التقرير (ونحذفه من نسخة الـSandbox برمجيًا) */
     .exporting th.col-actions, .exporting td.col-actions { display:none!important; }
     @media print{ th.col-actions, td.col-actions { display:none!important; } }
 
@@ -104,7 +109,7 @@
 
     /* صندوق التصدير */
     #printSandbox{position:fixed;left:-99999px;top:0;width:1200px;background:#fff;pointer-events:none;opacity:0}
-    #printSandbox .sheet{margin:0 0 18px 0;border:1px solid #eee;border-radius:12px;padding:0}
+    #printSandbox .sheet{margin:0 0 18px 0;border:1px solid #eee;border-radius:12px;padding:0;overflow:hidden}
     #printSandbox .sheet .card{border-radius:0;box-shadow:none;border:0}
     #printSandbox .sheet .card-h{border-bottom:1px solid #ddd}
     #printBannerImg, #siteBannerImg{max-width:100%;height:auto;display:block;margin:0 auto}
@@ -118,7 +123,7 @@
   <div class="container">
 
     <!-- ديباجة مرئية في الموقع -->
-    <div class="site-banner no-print">
+    <div class="site-banner">
       <div class="img-wrap">
         <img id="siteBannerImg" src="26.png" alt="ديباجة التقرير (الموقع)" />
       </div>
@@ -130,6 +135,7 @@
       <div class="stack">
         <button id="addWeekBtn" class="btn btn-primary">إضافة أسبوع</button>
         <button id="exportBtn" class="btn btn-primary">تصدير PDF</button>
+        <button id="shareBtn" class="btn btn-ghost" disabled>مشاركة التقرير</button>
       </div>
     </div>
 
@@ -185,7 +191,7 @@
 
   <script>
   (function(){
-    // فallback للصورة في الموقع والتقرير
+    // فfallback للصورة في الموقع والتقرير
     function attachFallback(imgEl){
       imgEl.addEventListener('error', function(){
         if(this.src.endsWith('26.png')) this.src='26.jpg';
@@ -196,10 +202,11 @@
     attachFallback(document.getElementById('printBannerImg'));
 
     var DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    var LS_KEY="sr-v12-weeks";
+    var LS_KEY="sr-v13-weeks";
     var weeksEl=document.getElementById("weeks");
     var addWeekBtn=document.getElementById("addWeekBtn");
     var exportBtn=document.getElementById("exportBtn");
+    var shareBtn=document.getElementById("shareBtn");
 
     var rowModal=document.getElementById("rowModal");
     var f_day=document.getElementById("f_day");
@@ -216,6 +223,7 @@
     var cancelRowBtn=document.getElementById("cancelRowBtn");
 
     var state=load(); var editCtx=null;
+    var lastPdfUrl=null; // نحتفظ برابط آخر تقرير لتفعيل المشاركة
 
     function load(){ try{var s=localStorage.getItem(LS_KEY);if(s) return JSON.parse(s);}catch(e){} return {weeks:[newWeek()]}; }
     function save(){ localStorage.setItem(LS_KEY,JSON.stringify(state)); }
@@ -324,9 +332,27 @@
 
     addWeekBtn.addEventListener("click",function(){state.weeks.push(newWeek()); render();});
 
+    /* ======= مشاركة التقرير (تحتاج رابط آخر PDF) ======= */
+    function enableShare(url){
+      lastPdfUrl = url;
+      shareBtn.disabled = false;
+    }
+    shareBtn.addEventListener("click", async function(){
+      if(!lastPdfUrl) return;
+      // مشاركة أصلية على الجوال إن توفرت
+      if(navigator.share){
+        try{
+          await navigator.share({title:"تقرير حصص الانتظار", text:"ملف التقرير بصيغة PDF", url:lastPdfUrl});
+        }catch(e){ /* تجاهل إلغاء المشاركة */ }
+      }else{
+        // فتح الرابط/تحميله كمشاركة بديلة
+        window.open(lastPdfUrl, "_blank");
+      }
+    });
+
     /* ======= تصدير PDF بالعرض: الصفحة الأولى = صورة الديباجة + أول أسبوع ======= */
     exportBtn.addEventListener("click",function(){
-      var newTab = window.open("", "_blank"); // فتح تبويب جديد تزامني يعمل على الجوال
+      var newTab = window.open("", "_blank"); // تبويب جديد متزامن (مهم للجوال)
       if(!newTab){ alert("رجاءً فعّل النوافذ المنبثقة مؤقتًا للتصدير."); return; }
 
       var area = document.getElementById("exportArea");
@@ -360,7 +386,7 @@
       document.body.classList.add("exporting","pdf-slim");
 
       var pdf = new window.jspdf.jsPDF("l","mm","a4");
-      var pageW=297, pageH=210;
+      var pageW=297;
       var scale = isMobile ? 1.1 : 1.5;
 
       (async function(){
@@ -380,9 +406,18 @@
         sandbox.remove();
 
         try{
-          var blobUrl = pdf.output("bloburl");
+          // نستخدم Blob لضمان عمله على iOS/Android
+          var blob = pdf.output("blob");
+          var blobUrl = URL.createObjectURL(blob);
+
+          // فتح التبويب بالرابط
           newTab.location.href = blobUrl;
-          setTimeout(function(){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }, 60000);
+
+          // تفعيل زر "مشاركة التقرير"
+          enableShare(blobUrl);
+
+          // تحرير الذاكرة بعد فترة
+          setTimeout(function(){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }, 5*60*1000);
         }catch(e){
           pdf.save("تقرير-حصص-الانتظار.pdf");
         }
