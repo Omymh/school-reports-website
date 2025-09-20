@@ -13,13 +13,13 @@
       --paper:#fff; --page:#f6faf8;
       --shadow:0 6px 22px rgba(0,0,0,.06);
       --shadow-soft:0 2px 10px rgba(0,0,0,.04);
-      --r:16px; /* radius موحّد */
+      --r:16px;
     }
     *{box-sizing:border-box}
     html,body{
       margin:0;padding:0;background:var(--page);color:var(--ink);
       font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.75;
-      overflow-x:hidden; /* يمنع البروز على الجوال */
+      overflow-x:hidden; /* يمنع بروزات على الجوال */
     }
     .container{max-width:1180px;margin:20px auto;padding:0 16px;overflow:hidden}
 
@@ -79,7 +79,7 @@
     .exporting .no-print{display:none!important} .exporting .print-only{display:block!important}
     .pdf-slim *{box-shadow:none!important}
 
-    /* إخفاء عمود "الإجراءات" في التقرير (وسنحذفه من نسخة الـSandbox برمجيًا أيضًا) */
+    /* إخفاء عمود "الإجراءات" في التقرير فقط (ونحذفه فعليًا من نسخة التصدير) */
     .exporting th.col-actions, .exporting td.col-actions { display:none!important; }
     @media print{ th.col-actions, td.col-actions { display:none!important; } }
 
@@ -125,7 +125,7 @@
       </div>
     </div>
 
-    <!-- شريط التحكم (بدون أي زر مشاركة هنا) -->
+    <!-- شريط التحكم -->
     <div class="toolbar no-print">
       <div class="title">تقرير حصص الانتظار</div>
       <div class="stack">
@@ -136,7 +136,7 @@
 
     <!-- منطقة التصدير -->
     <div id="exportArea">
-      <!-- الديباجة التي تظهر داخل التقرير -->
+      <!-- ديباجة التقرير (تظهر داخل PDF) -->
       <div class="print-only" id="printBanner">
         <img id="printBannerImg" src="26.png" alt="ديباجة التقرير (التقرير)" />
       </div>
@@ -186,7 +186,7 @@
 
   <script>
   (function(){
-    // فfallback للصورة في الموقع والتقرير
+    // fallback لصورة الديباجة
     function attachFallback(imgEl){
       imgEl.addEventListener('error', function(){
         if(this.src.endsWith('26.png')) this.src='26.jpg';
@@ -197,7 +197,7 @@
     attachFallback(document.getElementById('printBannerImg'));
 
     var DAYS=["","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
-    var LS_KEY="sr-v14-weeks";
+    var LS_KEY="sr-v15-weeks";
     var weeksEl=document.getElementById("weeks");
     var addWeekBtn=document.getElementById("addWeekBtn");
     var exportBtn=document.getElementById("exportBtn");
@@ -325,9 +325,9 @@
 
     addWeekBtn.addEventListener("click",function(){state.weeks.push(newWeek()); render();});
 
-    /* ======= تصدير PDF بالعرض وفتح صفحة تقرير فيها تنزيل/مشاركة ======= */
+    /* ======= تصدير PDF وفتح صفحة تقرير بها تنزيل/مشاركة ======= */
     exportBtn.addEventListener("click",function(){
-      const newTab = window.open("", "_blank"); // تبويب جديد متزامن (ضروري للجوال)
+      const newTab = window.open("", "_blank"); // تبويب متزامن (مهم للجوال)
       if(!newTab){ alert("رجاءً فعّل النوافذ المنبثقة مؤقتًا للتصدير."); return; }
 
       const area = document.getElementById("exportArea");
@@ -353,7 +353,7 @@
         sandbox.appendChild(s);
       }
 
-      // حذف عمود الإجراءات من نسخة التصدير
+      // احذف عمود "الإجراءات" من نسخة التصدير
       sandbox.querySelectorAll('th.col-actions, td.col-actions').forEach(function(el){
         if(el && el.parentNode) el.parentNode.removeChild(el);
       });
@@ -380,54 +380,33 @@
         sandbox.remove();
 
         try{
-          // أنشئ Blob ثم صفحة عرض بسيطة فيها زرّي تنزيل ومشاركة
           const blob = pdf.output("blob");
           const blobUrl = URL.createObjectURL(blob);
 
-          const viewerHTML = `
-<!doctype html><html lang="ar" dir="rtl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>تقرير حصص الانتظار (PDF)</title>
-<style>
-  body{margin:0;background:#f6faf8;font-family:Tajawal,system-ui;-webkit-font-smoothing:antialiased}
-  .bar{position:sticky;top:0;background:#fff;border-bottom:1px solid #e3ece6;padding:10px;display:flex;gap:10px;justify-content:center;z-index:10}
-  .btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-  .btn-primary{background:#28a745;color:#fff}
-  .btn-ghost{background:#fff;border:1px solid #e3ece6;color:#204c3d}
-  .frame{width:100%;height:calc(100dvh - 62px);border:0;display:block;background:#fff}
-</style></head><body>
-  <div class="bar">
-    <button id="dl" class="btn btn-primary">تنزيل PDF</button>
-    <button id="sh" class="btn btn-ghost">مشاركة</button>
-  </div>
-  <iframe class="frame" id="pdf" src="${blobUrl}"></iframe>
-<script>
-  const url='${blobUrl}';
-  document.getElementById('dl').addEventListener('click',()=>{
-    const a=document.createElement('a'); a.href=url; a.download='تقرير-حصص-الانتظار.pdf'; document.body.appendChild(a); a.click(); a.remove();
-  });
-  document.getElementById('sh').addEventListener('click',async ()=>{
-    try{
-      if(navigator.canShare){
-        try{
-          const resp = await fetch(url); const b = await resp.blob();
-          const file = new File([b],'تقرير-حصص-الانتظار.pdf',{type:'application/pdf'});
-          if(navigator.canShare({files:[file]})){
-            await navigator.share({files:[file], title:'تقرير حصص الانتظار'});
-            return;
-          }
-        }catch(e){}
-      }
-      if(navigator.share){ await navigator.share({title:'تقرير حصص الانتظار', url:url}); }
-      else { location.href = url; }
-    }catch(e){}
-  });
-</script></body></html>`;
+          // صفحة عرض التقرير (بدون كتابة </script> حرفيًا)
+          const viewerHead = '<!doctype html><html lang="ar" dir="rtl"><head>'+
+          '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+
+          '<title>تقرير حصص الانتظار (PDF)</title>'+
+          '<style>body{margin:0;background:#f6faf8;font-family:Tajawal,system-ui;-webkit-font-smoothing:antialiased}'+
+          '.bar{position:sticky;top:0;background:#fff;border-bottom:1px solid #e3ece6;padding:10px;display:flex;gap:10px;justify-content:center;z-index:10}'+
+          '.btn{appearance:none;border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}'+
+          '.btn-primary{background:#28a745;color:#fff} .btn-ghost{background:#fff;border:1px solid #e3ece6;color:#204c3d}'+
+          '.frame{width:100%;height:calc(100dvh - 62px);border:0;display:block;background:#fff}</style></head><body>';
+          const viewerBody = '<div class="bar">'+
+            '<button id="dl" class="btn btn-primary">تنزيل PDF</button>'+
+            '<button id="sh" class="btn btn-ghost">مشاركة</button>'+
+          '</div>'+
+          '<iframe class="frame" id="pdf" src="'+blobUrl+'"></iframe>';
+          const viewerScriptOpen = '<'+'script>';
+          const viewerScript = 'const url="'+blobUrl+'";'+
+            'document.getElementById("dl").addEventListener("click",()=>{const a=document.createElement("a");a.href=url;a.download="تقرير-حصص-الانتظار.pdf";document.body.appendChild(a);a.click();a.remove();});'+
+            'document.getElementById("sh").addEventListener("click",async ()=>{try{ if(navigator.canShare){ try{const resp=await fetch(url); const b=await resp.blob(); const file=new File([b],"تقرير-حصص-الانتظار.pdf",{type:"application/pdf"}); if(navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:"تقرير حصص الانتظار"}); return; }}catch(e){} } if(navigator.share){ await navigator.share({title:"تقرير حصص الانتظار", url:url}); } else { location.href=url; } }catch(e){} });';
+          const viewerScriptClose = '<'+'/script></body></html>';
+
           newTab.document.open();
-          newTab.document.write(viewerHTML);
+          newTab.document.write(viewerHead + viewerBody + viewerScriptOpen + viewerScript + viewerScriptClose);
           newTab.document.close();
 
-          // حرر الذاكرة بعد 5 دقائق
           setTimeout(function(){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }, 5*60*1000);
         }catch(e){
           pdf.save("تقرير-حصص-الانتظار.pdf");
